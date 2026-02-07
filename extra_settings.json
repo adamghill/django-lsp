@@ -1,0 +1,11 @@
+[
+    {
+        "label": "BASE_DIR",
+        "description": "The absolute filesystem path to the directory containing your Django project. This is typically the directory containing `manage.py`. It's used as the base for constructing other paths like `DATABASES.NAME` for SQLite, `STATICFILES_DIRS`, and template directories.\n\nThis setting is defined in the default project template created by `django-admin startproject`, but is not an official Django setting.",
+        "example": "from pathlib import Path\n\nBASE_DIR = Path(__file__).resolve().parent.parent",
+        "default": "Path(__file__).resolve().parent.parent",
+        "category": "Project",
+        "name": "BASE_DIR",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/"
+    }
+]

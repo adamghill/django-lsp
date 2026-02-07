@@ -1,0 +1,24 @@
+# Source files (bundled into out/extension.js)
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+
+# Node modules (bundled by esbuild)
+node_modules/
+
+# Development files
+.git/
+.gitignore
+
+# Test files
+test/
+out/test/
+out/src/
+*.test.js
+
+# VSIX files from previous builds
+*.vsix
+
+# Package lock
+package-lock.json

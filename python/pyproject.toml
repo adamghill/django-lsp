@@ -1,0 +1,54 @@
+[project]
+name = "django-lsp"
+version = "0.1.0"
+description = "Language Server Protocol implementation for Django settings.py files"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    { name = "Adam Hill" }
+]
+keywords = ["django", "lsp", "language-server", "settings"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Editors :: Integrated Development Environments (IDE)",
+]
+
+dependencies = [
+    "pygls>=2.0",
+    "lsprotocol>=2024.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=0.21",
+]
+
+[project.scripts]
+django-lsp = "django_lsp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/django_lsp"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    "src",
+]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

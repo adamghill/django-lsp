@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+
+# VS Code extension - generated/synced files
+vscode/catalog/
+vscode/django_lsp/
+vscode/out/
+vscode/*.vsix
+vscode/node_modules/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.DS_Store

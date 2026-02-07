@@ -1,0 +1,81 @@
+{
+  "name": "django-lsp",
+  "displayName": "Django ✨",
+  "description": "Smart autocomplete for Django applications.",
+  "version": "0.1.0",
+  "publisher": "adamghill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adamghill/django-lsp.git"
+  },
+  "private": true,
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Snippets",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "django",
+    "python",
+    "settings",
+    "autocomplete",
+    "intellisense"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Django ✨",
+      "properties": {
+        "django-lsp.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Python interpreter. Leave empty to auto-detect."
+        },
+        "django-lsp.djangoVersion": {
+          "type": "string",
+          "default": "5.0",
+          "description": "The Django version to target for documentation links and setting defaults."
+        },
+        "django-lsp.includeDeprecated": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show deprecated Django settings in completions."
+        },
+        "django-lsp.ignoreUnknownSettings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ignore unknown Django settings."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc --watch",
+    "bundle": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "package": "npm run sync-code && npm run bundle && vsce package",
+    "pretest": "npm run compile",
+    "sync-code": "rm -rf ./django_lsp ./catalog && mkdir -p ./django_lsp ./catalog && cp -R ../python/src/django_lsp/* ./django_lsp/ && cp ../python/src/django_lsp/data/settings.json ./catalog/settings.json",
+    "test": "npm run compile && node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.20.0",
+    "glob": "^13.0.1",
+    "mocha": "^10.0.0",
+    "mochi": "^0.3.0",
+    "typescript": "^5.0.0"
+  }
+}
