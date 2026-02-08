@@ -20,8 +20,7 @@ class DjangoSetting:
     children: list["DjangoSetting"] = field(default_factory=list)
     name: str = ""
 
-    @property
-    def markdown_docs(self) -> str:
+    def get_markdown_docs(self, django_version: str = "stable") -> str:
         """Return formatted markdown documentation for hover."""
         parts = [f"## {self.label}"]
 
@@ -35,9 +34,17 @@ class DjangoSetting:
             parts.append(f"\n**Example:**\n```python\n{self.example}\n```")
 
         if self.docs_url:
-            parts.append(f"\n[Django Docs]({self.docs_url})")
+            url = self.docs_url
+            if django_version != "stable":
+                url = url.replace("/stable/", f"/{django_version}/")
+            parts.append(f"\n[Django Docs]({url})")
 
         return "\n".join(parts)
+
+    @property
+    def markdown_docs(self) -> str:
+        """Deprecated: use get_markdown_docs(version) instead."""
+        return self.get_markdown_docs()
 
 
 class SettingsCatalog:

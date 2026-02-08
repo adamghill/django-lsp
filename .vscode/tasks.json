@@ -1,0 +1,37 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile-extension",
+            "type": "shell",
+            "command": "npm run package",
+            "options": {
+                "cwd": "${workspaceFolder}/vscode"
+            },
+            "problemMatcher": "$tsc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "watch-extension",
+            "type": "shell",
+            "command": "npm run watch",
+            "options": {
+                "cwd": "${workspaceFolder}/vscode"
+            },
+            "problemMatcher": "$tsc-watch",
+            "isBackground": true
+        },
+        {
+            "label": "sync-python-code",
+            "type": "shell",
+            "command": "npm run sync-code",
+            "options": {
+                "cwd": "${workspaceFolder}/vscode"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

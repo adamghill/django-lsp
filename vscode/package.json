@@ -36,10 +36,15 @@
           "default": "",
           "description": "Path to Python interpreter. Leave empty to auto-detect."
         },
+        "django-lsp.djangoSettingsModule": {
+          "type": "string",
+          "default": "",
+          "description": "Value for DJANGO_SETTINGS_MODULE to enable ORM introspection."
+        },
         "django-lsp.djangoVersion": {
           "type": "string",
-          "default": "5.0",
-          "description": "The Django version to target for documentation links and setting defaults."
+          "default": "stable",
+          "description": "Django version for documentation links (e.g. '5.0', '4.2', or 'stable')."
         },
         "django-lsp.includeDeprecated": {
           "type": "boolean",

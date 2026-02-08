@@ -3,6 +3,7 @@ server.py - Main LSP server implementation for Django settings.
 """
 
 import logging
+import os
 import re
 from pathlib import Path
 
@@ -11,6 +12,17 @@ from pygls.lsp.server import LanguageServer
 from pygls.workspace import TextDocument
 
 from django_lsp.catalog import DjangoSetting, SettingsCatalog
+from django_lsp.orm import (
+    ORM_FEATURES_AVAILABLE,
+    PARSO_AVAILABLE,
+    create_document_cache,
+    get_model_loader,
+    get_orm_completion_feature,
+    get_orm_hover_feature,
+    get_parser,
+)
+from django_lsp.orm.document_cache import ORMOperation
+from django_lsp.orm.feature_detection import DJANGO_AVAILABLE
 
 # Set up logging - messages go to stderr which VS Code captures
 logging.basicConfig(level=logging.DEBUG, format="[django-lsp] %(message)s")
@@ -22,12 +34,20 @@ server = LanguageServer("django-lsp", "v0.1.0")
 # Load the settings catalog
 catalog = SettingsCatalog()
 
+# ORM State
+model_loader = None
+document_cache = None
+orm_completion = None
+orm_hover = None
+parso_parser = None
+
 # Pattern to match Python assignment: SETTING_NAME = ...
 SETTING_PATTERN = re.compile(r"^([A-Z][A-Z0-9_]*)\s*=", re.MULTILINE)
 
 # Global settings state
 server_settings = {
     "ignoreUnknownSettings": True,
+    "djangoVersion": "stable",
 }
 
 
@@ -47,14 +67,16 @@ def _fetch_configuration(revalidate: bool = False) -> None:
             # pygls returns a tuple, not a list
             if config and isinstance(config, (list, tuple)) and len(config) > 0:
                 ls_config = config[0]
-                old_value = server_settings["ignoreUnknownSettings"]
                 server_settings["ignoreUnknownSettings"] = ls_config.get(
                     "ignoreUnknownSettings", True
                 )
+                server_settings["djangoVersion"] = ls_config.get(
+                    "djangoVersion", "stable"
+                )
                 logger.debug(
-                    "ignoreUnknownSettings: %s -> %s",
-                    old_value,
+                    "Configuration updated: ignoreUnknownSettings=%s, djangoVersion=%s",
                     server_settings["ignoreUnknownSettings"],
+                    server_settings["djangoVersion"],
                 )
                 # Re-validate all open documents if requested
                 if revalidate:
@@ -62,6 +84,23 @@ def _fetch_configuration(revalidate: bool = False) -> None:
                     logger.debug("Revalidating %d open documents: %s", len(docs), docs)
                     for uri in docs:
                         _validate_document(uri)
+
+                # Also update ORM features if they are initialized
+                # Get the shared instances
+                from django_lsp.orm import (
+                    get_orm_completion_feature,
+                    get_orm_hover_feature,
+                )
+
+                version = server_settings["djangoVersion"]
+
+                comp = get_orm_completion_feature()
+                if comp and hasattr(comp, "doc_generator"):
+                    comp.doc_generator.django_version = version
+
+                hvr = get_orm_hover_feature()
+                if hvr and hasattr(hvr, "doc_generator"):
+                    hvr.doc_generator.django_version = version
         except Exception as e:
             logger.exception("Error in _on_config: %s", e)
 
@@ -79,6 +118,38 @@ def initialized(params: types.InitializedParams) -> None:
     """Fetch initial configuration when the server is initialized."""
     logger.debug("INITIALIZED event received")
     _fetch_configuration(revalidate=True)
+    logger.info(
+        "ORM dependencies: django_available=%s, parso_available=%s, "
+        "DJANGO_SETTINGS_MODULE=%s",
+        DJANGO_AVAILABLE,
+        PARSO_AVAILABLE,
+        os.environ.get("DJANGO_SETTINGS_MODULE", "NOT SET"),
+    )
+
+    # Initialize ORM features
+    global model_loader, document_cache, orm_completion, orm_hover, parso_parser
+    if ORM_FEATURES_AVAILABLE:
+        try:
+            logger.info("Initializing ORM features...")
+            model_loader = get_model_loader()
+            document_cache = create_document_cache(model_loader)
+            orm_completion = get_orm_completion_feature(model_loader, document_cache)
+            orm_hover = get_orm_hover_feature(model_loader, document_cache)
+
+            # Pass djangoVersion to documentation generator
+            django_version = server_settings.get("djangoVersion", "stable")
+            if orm_completion and hasattr(orm_completion, "doc_generator"):
+                orm_completion.doc_generator.django_version = django_version
+            if orm_hover and hasattr(orm_hover, "doc_generator"):
+                orm_hover.doc_generator.django_version = django_version
+
+            if PARSO_AVAILABLE:
+                parso_parser = get_parser()
+                logger.info("ORM features initialized successfully")
+            else:
+                logger.warning("Parso parser not available - ORM features limited")
+        except Exception as e:
+            logger.error("Failed to initialize ORM features: %s", e)
 
 
 @server.feature(types.WORKSPACE_DID_CHANGE_CONFIGURATION)
@@ -355,10 +426,30 @@ def is_value_context(document: TextDocument, position: types.Position) -> bool:
 )
 def completions(params: types.CompletionParams) -> types.CompletionList:
     """Provide completions for Django settings."""
-    if not is_settings_file(params.text_document.uri):
+    uri = params.text_document.uri
+    document = server.workspace.get_text_document(uri)
+
+    # 1. ORM Completions (for non-settings files)
+    if not is_settings_file(uri):
+        if document_cache:
+            try:
+                document_cache.cache_document_source(uri, document.source)
+            except Exception as e:
+                logger.debug("Failed to cache document source for %s: %s", uri, e)
+        _analyze_orm(uri)
+        if ORM_FEATURES_AVAILABLE and orm_completion:
+            return types.CompletionList(
+                is_incomplete=False,
+                items=orm_completion.get_completions(
+                    uri,
+                    params.position.line,
+                    params.position.character,
+                    document.source,
+                ),
+            )
         return types.CompletionList(is_incomplete=False, items=[])
 
-    document = server.workspace.get_text_document(params.text_document.uri)
+    # 2. Settings Completions
     if is_value_context(document, params.position):
         return types.CompletionList(is_incomplete=False, items=[])
 
@@ -482,7 +573,9 @@ def _create_completion_item(
         detail=setting.category,
         documentation=types.MarkupContent(
             kind=types.MarkupKind.Markdown,
-            value=setting.markdown_docs,
+            value=setting.get_markdown_docs(
+                server_settings.get("djangoVersion", "stable")
+            ),
         ),
         text_edit=types.TextEdit(range=completion_range, new_text=insert_text)
         if completion_range
@@ -502,6 +595,25 @@ def _create_completion_item(
 def hover(params: types.HoverParams) -> types.Hover | None:
     """Provide hover documentation for Django settings."""
     if not is_settings_file(params.text_document.uri):
+        if document_cache:
+            try:
+                document = server.workspace.get_text_document(params.text_document.uri)
+                document_cache.cache_document_source(
+                    params.text_document.uri, document.source
+                )
+            except Exception as e:
+                logger.debug(
+                    "Failed to cache document source for %s: %s",
+                    params.text_document.uri,
+                    e,
+                )
+        _analyze_orm(params.text_document.uri)
+        if ORM_FEATURES_AVAILABLE and orm_hover:
+            return orm_hover.get_hover(
+                params.text_document.uri,
+                params.position.line,
+                params.position.character,
+            )
         return None
 
     document = server.workspace.get_text_document(params.text_document.uri)
@@ -530,7 +642,9 @@ def hover(params: types.HoverParams) -> types.Hover | None:
     return types.Hover(
         contents=types.MarkupContent(
             kind=types.MarkupKind.Markdown,
-            value=setting.markdown_docs,
+            value=setting.get_markdown_docs(
+                server_settings.get("djangoVersion", "stable")
+            ),
         ),
     )
 
@@ -563,7 +677,14 @@ def _validate_document(uri: str) -> None:
     logger.debug("_validate_document called: %s", uri)
 
     if not is_settings_file(uri):
-        logger.debug("Not a settings file, skipping: %s", uri)
+        if document_cache:
+            try:
+                document = server.workspace.get_text_document(uri)
+                document_cache.cache_document_source(uri, document.source)
+            except Exception as e:
+                logger.debug("Failed to cache document source for %s: %s", uri, e)
+        # If not settings file, try ORM analysis
+        _analyze_orm(uri)
         return
 
     # Skip diagnostics if disabled
@@ -639,6 +760,27 @@ def _validate_document(uri: str) -> None:
 # ─────────────────────────────────────────────────────────────
 # ENTRY POINT
 # ─────────────────────────────────────────────────────────────
+
+
+def _analyze_orm(uri: str) -> None:
+    """Analyze document for ORM operations and update cache."""
+    if not ORM_FEATURES_AVAILABLE or not parso_parser or not document_cache:
+        return
+
+    try:
+        document = server.workspace.get_text_document(uri)
+        ops_data = parso_parser.extract_orm_operations_with_ranges(document.source)
+
+        # Convert dicts to ORMOperation objects
+        orm_operations = []
+        for op in ops_data:
+            orm_operations.append(ORMOperation(**op))
+
+        document_cache.cache_orm_operations(uri, orm_operations)
+        logger.debug("Cached %d ORM operations for %s", len(orm_operations), uri)
+
+    except Exception as e:
+        logger.error("Error analyzing ORM for %s: %s", uri, e)
 
 
 def main():
