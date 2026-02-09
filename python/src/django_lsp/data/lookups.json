@@ -1,0 +1,182 @@
+[
+  {
+    "name": "exact",
+    "description": "Exact match. If the value provided for comparison is `None`, it will be\ninterpreted as an SQL `NULL` (see :lookup:`isnull` for more details).\n:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they\ninterpret `None` as JSON `null` instead.\n\nExamples::\n\n    Entry.objects.get(id__exact=14)\n    Entry.objects.get(id__exact=None)\n\nSQL equivalents:",
+    "example": "Entry.objects.get(id__exact=14)\nEntry.objects.get(id__exact=None)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#exact"
+  },
+  {
+    "name": "iexact",
+    "description": "Case-insensitive exact match. If the value provided for comparison is `None`,\nit will be interpreted as an SQL `NULL` (see :lookup:`isnull` for more\ndetails).",
+    "example": "Blog.objects.get(name__iexact=\"beatles blog\")\nBlog.objects.get(name__iexact=None)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iexact"
+  },
+  {
+    "name": "contains",
+    "description": "Case-sensitive containment test.",
+    "example": "Entry.objects.get(headline__contains=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#contains"
+  },
+  {
+    "name": "icontains",
+    "description": "Case-insensitive containment test.",
+    "example": "Entry.objects.get(headline__icontains=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#icontains"
+  },
+  {
+    "name": "in",
+    "description": "In a given iterable; often a list, tuple, or queryset. It's not a common use\ncase, but strings (being iterables) are accepted.\n\nExamples::\n\n    Entry.objects.filter(id__in=[1, 3, 4])\n    Entry.objects.filter(headline__in=\"abc\")\n\nSQL equivalents:",
+    "example": "Entry.objects.filter(id__in=[1, 3, 4])\nEntry.objects.filter(headline__in=\"abc\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#in"
+  },
+  {
+    "name": "gt",
+    "description": "Greater than.",
+    "example": "Entry.objects.filter(id__gt=4)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#gt"
+  },
+  {
+    "name": "gte",
+    "description": "Greater than or equal to.",
+    "example": "",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#gte"
+  },
+  {
+    "name": "lt",
+    "description": "Less than.",
+    "example": "",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#lt"
+  },
+  {
+    "name": "lte",
+    "description": "Less than or equal to.",
+    "example": "",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#lte"
+  },
+  {
+    "name": "startswith",
+    "description": "Case-sensitive starts-with.",
+    "example": "Entry.objects.filter(headline__startswith=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#startswith"
+  },
+  {
+    "name": "istartswith",
+    "description": "Case-insensitive starts-with.",
+    "example": "Entry.objects.filter(headline__istartswith=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#istartswith"
+  },
+  {
+    "name": "endswith",
+    "description": "Case-sensitive ends-with.",
+    "example": "Entry.objects.filter(headline__endswith=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#endswith"
+  },
+  {
+    "name": "iendswith",
+    "description": "Case-insensitive ends-with.",
+    "example": "Entry.objects.filter(headline__iendswith=\"Lennon\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iendswith"
+  },
+  {
+    "name": "range",
+    "description": "Range test (inclusive).",
+    "example": "import datetime\n\nstart_date = datetime.date(2005, 1, 1)\nend_date = datetime.date(2005, 3, 31)\nEntry.objects.filter(pub_date__range=(start_date, end_date))",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#range"
+  },
+  {
+    "name": "date",
+    "description": "For datetime fields, casts the value as date. Allows chaining additional field\nlookups. Takes a date value.",
+    "example": "Entry.objects.filter(pub_date__date=datetime.date(2005, 1, 1))\nEntry.objects.filter(pub_date__date__gt=datetime.date(2005, 1, 1))",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#date"
+  },
+  {
+    "name": "year",
+    "description": "For date and datetime fields, an exact year match. Allows chaining additional\nfield lookups. Takes an integer year.",
+    "example": "Entry.objects.filter(pub_date__year=2005)\nEntry.objects.filter(pub_date__year__gte=2005)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#year"
+  },
+  {
+    "name": "iso_year",
+    "description": "For date and datetime fields, an exact ISO 8601 week-numbering year match.\nAllows chaining additional field lookups. Takes an integer year.",
+    "example": "Entry.objects.filter(pub_date__iso_year=2005)\nEntry.objects.filter(pub_date__iso_year__gte=2005)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iso_year"
+  },
+  {
+    "name": "month",
+    "description": "For date and datetime fields, an exact month match. Allows chaining additional\nfield lookups. Takes an integer 1 (January) through 12 (December).",
+    "example": "Entry.objects.filter(pub_date__month=12)\nEntry.objects.filter(pub_date__month__gte=6)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#month"
+  },
+  {
+    "name": "day",
+    "description": "For date and datetime fields, an exact day match. Allows chaining additional\nfield lookups. Takes an integer day.",
+    "example": "Entry.objects.filter(pub_date__day=3)\nEntry.objects.filter(pub_date__day__gte=3)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#day"
+  },
+  {
+    "name": "week",
+    "description": "For date and datetime fields, return the week number (1-52 or 53) according\nto `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start\non a Monday and the first week contains the year's first Thursday.",
+    "example": "Entry.objects.filter(pub_date__week=52)\nEntry.objects.filter(pub_date__week__gte=32, pub_date__week__lte=38)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#week"
+  },
+  {
+    "name": "week_day",
+    "description": "For date and datetime fields, a 'day of the week' match. Allows chaining\nadditional field lookups.\n\nTakes an integer value representing the day of week from 1 (Sunday) to 7\n(Saturday).",
+    "example": "Entry.objects.filter(pub_date__week_day=2)\nEntry.objects.filter(pub_date__week_day__gte=2)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#week_day"
+  },
+  {
+    "name": "iso_week_day",
+    "description": "For date and datetime fields, an exact ISO 8601 day of the week match. Allows\nchaining additional field lookups.\n\nTakes an integer value representing the day of the week from 1 (Monday) to 7\n(Sunday).",
+    "example": "Entry.objects.filter(pub_date__iso_week_day=1)\nEntry.objects.filter(pub_date__iso_week_day__gte=1)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iso_week_day"
+  },
+  {
+    "name": "quarter",
+    "description": "For date and datetime fields, a 'quarter of the year' match. Allows chaining\nadditional field lookups. Takes an integer value between 1 and 4 representing\nthe quarter of the year.\n\nExample to retrieve entries in the second quarter (April 1 to June 30)::\n\n    Entry.objects.filter(pub_date__quarter=2)\n\n(No equivalent SQL code fragment is included for this lookup because\nimplementation of the relevant query varies among different database engines.)\n\nWhen `USE_TZ` is `True`, datetime fields are converted to the\ncurrent time zone before filtering. This requires :ref:`time zone definitions\nin the database <database-time-zone-definitions>`.",
+    "example": "Entry.objects.filter(pub_date__quarter=2)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#quarter"
+  },
+  {
+    "name": "time",
+    "description": "For datetime fields, casts the value as time. Allows chaining additional field\nlookups. Takes a `datetime.time` value.",
+    "example": "Entry.objects.filter(pub_date__time=datetime.time(14, 30))\nEntry.objects.filter(pub_date__time__range=(datetime.time(8), datetime.time(17)))",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#time"
+  },
+  {
+    "name": "hour",
+    "description": "For datetime and time fields, an exact hour match. Allows chaining additional\nfield lookups. Takes an integer between 0 and 23.",
+    "example": "Event.objects.filter(timestamp__hour=23)\nEvent.objects.filter(time__hour=5)\nEvent.objects.filter(timestamp__hour__gte=12)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#hour"
+  },
+  {
+    "name": "minute",
+    "description": "For datetime and time fields, an exact minute match. Allows chaining additional\nfield lookups. Takes an integer between 0 and 59.",
+    "example": "Event.objects.filter(timestamp__minute=29)\nEvent.objects.filter(time__minute=46)\nEvent.objects.filter(timestamp__minute__gte=29)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#minute"
+  },
+  {
+    "name": "second",
+    "description": "For datetime and time fields, an exact second match. Allows chaining additional\nfield lookups. Takes an integer between 0 and 59.",
+    "example": "Event.objects.filter(timestamp__second=31)\nEvent.objects.filter(time__second=2)\nEvent.objects.filter(timestamp__second__gte=31)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#second"
+  },
+  {
+    "name": "isnull",
+    "description": "Takes either `True` or `False`, which correspond to SQL queries of\n`IS NULL` and `IS NOT NULL`, respectively.",
+    "example": "Entry.objects.filter(pub_date__isnull=True)",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#isnull"
+  },
+  {
+    "name": "regex",
+    "description": "Case-sensitive regular expression match.\n\nThe regular expression syntax is that of the database backend in use.\nIn the case of SQLite, which has no built in regular expression support,\nthis feature is provided by a (Python) user-defined REGEXP function, and\nthe regular expression syntax is therefore that of Python's `re` module.",
+    "example": "Entry.objects.get(title__regex=r\"^(An?|The) +\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#regex"
+  },
+  {
+    "name": "iregex",
+    "description": "Case-insensitive regular expression match.",
+    "example": "Entry.objects.get(title__iregex=r\"^(an?|the) +\")",
+    "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iregex"
+  }
+]

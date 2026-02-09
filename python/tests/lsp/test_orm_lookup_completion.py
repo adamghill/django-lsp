@@ -56,12 +56,9 @@ def test_lookup_completion_has_documentation():
     assert exact_completion is not None
     assert exact_completion.documentation is not None
     assert "## 🔍 name__exact" in exact_completion.documentation.value
-    # It should contain the lookup description if available from the field analysis side (via _get_lookup_description)
-    # OR at least the fallback description
-    assert (
-        "Exact match lookup documentation" in exact_completion.documentation.value
-        or "Applies the `exact` lookup" in exact_completion.documentation.value
-    )
+    # It should contain the lookup description from the catalog
+    assert "Exact match" in exact_completion.documentation.value
+    assert "Entry.objects.get(id__exact=14)" in exact_completion.documentation.value
 
     icontains_completion = next(
         (c for c in completions if c.label == "name__icontains"), None
@@ -71,5 +68,8 @@ def test_lookup_completion_has_documentation():
     assert "## 🔍 name__icontains" in icontains_completion.documentation.value
     assert (
         "Case-insensitive containment test" in icontains_completion.documentation.value
-        or "Applies the `icontains` lookup" in icontains_completion.documentation.value
+    )
+    assert (
+        'Entry.objects.get(headline__icontains="Lennon")'
+        in icontains_completion.documentation.value
     )

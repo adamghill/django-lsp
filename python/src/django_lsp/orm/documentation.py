@@ -1,7 +1,5 @@
-"""
-Documentation generation utilities for ORM features.
-"""
-
+import json
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from lsprotocol.types import MarkupContent, MarkupKind
@@ -12,6 +10,22 @@ class DocumentationGenerator:
 
     def __init__(self, django_version: str = "stable"):
         self.django_version = django_version
+        self._lookups = self._load_lookups()
+
+    def _load_lookups(self) -> Dict[str, Dict[str, str]]:
+        """Load lookup documentation from the JSON catalog."""
+        try:
+            # Look for lookups.json in the data directory
+            data_dir = Path(__file__).parent.parent / "data"
+            lookups_path = data_dir / "lookups.json"
+
+            if lookups_path.exists():
+                with open(lookups_path, "r", encoding="utf-8") as f:
+                    lookups_list = json.load(f)
+                    return {item["name"]: item for item in lookups_list}
+        except Exception:
+            pass
+        return {}
 
     def generate_model_documentation(self, model_info: Dict[str, Any]) -> MarkupContent:
         """
@@ -165,6 +179,7 @@ class DocumentationGenerator:
         field_info: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Get description for a lookup."""
+        # 1. Check field_info (pre-analyzed data from ModelLoader)
         if field_info and "lookups" in field_info:
             lookups = field_info["lookups"]
             for lookup in lookups:
@@ -176,4 +191,20 @@ class DocumentationGenerator:
                         return str(doc)
                     break
 
+        # 2. Check the catalog for rich documentation
+        if lookup_name in self._lookups:
+            lookup_data = self._lookups[lookup_name]
+            description = lookup_data.get("description", "")
+            example = lookup_data.get("example", "")
+
+            doc_parts = []
+            if description:
+                doc_parts.append(description)
+            if example:
+                doc_parts.append(f"**Example**:\n```python\n{example}\n```")
+
+            if doc_parts:
+                return "\n\n".join(doc_parts)
+
+        # 3. Fallback
         return f"Applies the `{lookup_name}` lookup to the `{field_type}` field."
