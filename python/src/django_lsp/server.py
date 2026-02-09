@@ -570,7 +570,7 @@ def _create_completion_item(
     return types.CompletionItem(
         label=label,
         kind=types.CompletionItemKind.Constant,
-        detail=setting.category,
+        detail=f"Setting: {setting.category}",
         documentation=types.MarkupContent(
             kind=types.MarkupKind.Markdown,
             value=setting.get_markdown_docs(

@@ -13,8 +13,6 @@ from lsprotocol.types import (
     CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
-    MarkupContent,
-    MarkupKind,
 )
 
 from django_lsp.orm.documentation import DocumentationGenerator
@@ -180,19 +178,17 @@ class ORMCompletionFeature:
 
         # Add lookup completions
         for lookup in completion_data.get("lookups", []):
-            doc = lookup.documentation
-            if doc:
-                # Format lookup documentation nicely
-                doc_parts = [f"### Lookup: {lookup.lookup_type}"]
-                if lookup.field_name:
-                    doc_parts.append(f"**Field**: `{lookup.field_name}`")
-                doc_parts.append(doc)
-
-                documentation = MarkupContent(
-                    kind=MarkupKind.Markdown, value="\n\n".join(doc_parts)
-                )
-            else:
-                documentation = None
+            # Use unified lookup documentation format
+            documentation = self.doc_generator.generate_field_lookup_documentation(
+                {
+                    "type": lookup.field_type or "Unknown",
+                    "help_text": "",
+                    "verbose_name": lookup.field_name or "",
+                },
+                lookup.field_name or "field",
+                lookup.lookup_type,
+                "Model",
+            )
 
             items.append(
                 CompletionItem(

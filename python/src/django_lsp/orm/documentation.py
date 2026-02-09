@@ -27,22 +27,25 @@ class DocumentationGenerator:
         app_label = model_info.get("app_label", "")
         verbose_name = model_info.get("verbose_name", model_name)
 
-        doc_parts = [f"### Model: {model_name}"]
+        doc_parts = [f"## 🏗️ {model_name}", "---"]
 
+        details = []
         if app_label:
-            doc_parts.append(f"*App: {app_label}*")
-
+            details.append(f"- **App:** `{app_label}`")
         if verbose_name and verbose_name.lower() != model_name.lower():
-            doc_parts.append(f"**Verbose name**: {verbose_name}")
+            details.append(f"- **Verbose name:** {verbose_name}")
+
+        if details:
+            doc_parts.append("\n".join(details))
 
         if model_info.get("docstring"):
-            doc_parts.append(model_info["docstring"])
+            doc_parts.append(f"\n{model_info['docstring']}")
 
         # Summary of fields
         fields = model_info.get("fields", {})
         if fields:
             field_list = sorted(fields.keys())
-            doc_parts.append("**Fields**: " + ", ".join(f"`{f}`" for f in field_list))
+            doc_parts.append("\n**Fields**: " + ", ".join(f"`{f}`" for f in field_list))
 
         # Add documentation link
         if app_label:
@@ -67,7 +70,7 @@ class DocumentationGenerator:
         """
         field_type = field_info.get("type", "Unknown")
 
-        doc_parts = [f"# {field_name}"]
+        doc_parts = [f"## 🏷️ {field_name}", "---"]
 
         # Add field-specific information from FieldAnalysis dict
         help_text = field_info.get("help_text")
@@ -77,30 +80,33 @@ class DocumentationGenerator:
         elif docstring:
             doc_parts.append(docstring)
 
-        details = [f"- Type: `{field_type}`"]
+        details = [f"- **Type:** `{field_type}`"]
 
         if field_info.get("verbose_name") and field_info["verbose_name"] != field_name:
-            details.append(f"- Verbose name: {field_info['verbose_name']}")
+            details.append(f"- **Verbose name:** {field_info['verbose_name']}")
 
         if field_info.get("max_length"):
-            details.append(f"- Max length: {field_info['max_length']}")
+            details.append(f"- **Max length:** {field_info['max_length']}")
 
         if field_info.get("null"):
-            details.append("- Nullable: Yes")
+            details.append("- **Nullable:** Yes")
+        else:
+            details.append("- **Nullable:** No")
 
         if field_info.get("blank"):
-            details.append("- Blank allowed: Yes")
+            details.append("- **Blank allowed:** Yes")
+        else:
+            details.append("- **Blank allowed:** No")
 
         if field_info.get("default") is not None:
-            details.append(f"- Default: {field_info['default']}")
+            details.append(f"- **Default:** `{field_info['default']}`")
 
         if field_info.get("related_model"):
-            details.append(f"- Related model: `{field_info['related_model']}`")
+            details.append(f"- **Related model:** `{field_info['related_model']}`")
 
         doc_parts.append("\n".join(details))
 
         # Add documentation link
-        # Common field type to URL mapping (simplified)
         doc_parts.append(
             f"\n[Django Documentation](https://docs.djangoproject.com/en/{self.django_version}/ref/models/fields/#django.db.models.{field_type})"
         )
@@ -129,19 +135,21 @@ class DocumentationGenerator:
         field_type = field_info.get("type", "Unknown")
         verbose_name = field_info.get("verbose_name", field_name)
 
-        doc_parts = [f"### {field_name}__{lookup_name}"]
+        doc_parts = [f"## 🔍 {field_name}__{lookup_name}", "---"]
 
-        # Field summary
-        field_summary = f"**{verbose_name}** (`{field_type}`)"
-        if field_info.get("help_text"):
-            field_summary += f": {field_info['help_text']}"
-        doc_parts.append(field_summary)
+        details = []
+        details.append(f"- **Field:** `{field_name}` ({field_type})")
+        if verbose_name and verbose_name != field_name:
+            details.append(f"- **Verbose name:** {verbose_name}")
+        details.append(f"- **Lookup:** `{lookup_name}`")
 
-        # Lookup information
+        doc_parts.append("\n".join(details))
+
+        # Lookup description
         lookup_description = self._get_lookup_description(
             lookup_name, field_type, field_info
         )
-        doc_parts.append(f"**Lookup**: `{lookup_name}`\n\n{lookup_description}")
+        doc_parts.append(lookup_description)
 
         # Add documentation link
         doc_parts.append(

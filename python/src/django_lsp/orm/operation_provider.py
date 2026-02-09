@@ -32,6 +32,7 @@ class LookupCompletionData:
     name: str
     lookup_type: str = ""
     field_name: str = ""
+    field_type: str = "Unknown"
     documentation: Optional[str] = None
 
 
@@ -233,6 +234,7 @@ class OperationProvider:
                         name=full_lookup_name,
                         lookup_type=lookup.name,
                         field_name=getattr(field_analysis, "name", "unknown"),
+                        field_type=getattr(field_analysis, "type", "Unknown"),
                         documentation=lookup.doc,
                     )
                 )

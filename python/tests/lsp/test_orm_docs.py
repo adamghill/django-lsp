@@ -49,7 +49,7 @@ def test_completion_has_help_text():
     # Verify help_text is in documentation
     name_completion = next(c for c in completions if c.label == "name")
     assert "The model's name" in name_completion.documentation.value
-    assert "# name" in name_completion.documentation.value
+    assert "## 🏷️ name" in name_completion.documentation.value
     assert (
         "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField)"
         in name_completion.documentation.value
@@ -154,7 +154,7 @@ def test_completion_with_underscore_prefix():
     thread_id_comp = next((c for c in completions if c.label == "thread_id"), None)
     assert thread_id_comp is not None
     assert "Gmail thread ID" in thread_id_comp.documentation.value
-    assert "# thread_id" in thread_id_comp.documentation.value
+    assert "## 🏷️ thread_id" in thread_id_comp.documentation.value
     assert (
         "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField)"
         in thread_id_comp.documentation.value
