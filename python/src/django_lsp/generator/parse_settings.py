@@ -15,10 +15,17 @@ import argparse
 import json
 import re
 import sys
-import urllib.request
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
+
+from django_lsp.generator.common import (
+    clean_rst_markup,
+    download_file,
+    extract_code_example,
+    slugify,
+    strip_trailing_pointers,
+)
 
 SETTINGS_URL = (
     "https://raw.githubusercontent.com/django/django/main/docs/ref/settings.txt"
@@ -39,120 +46,6 @@ class DjangoSetting:
     category: str = "Core"
     children: Optional[list["DjangoSetting"]] = None
     name: str = ""
-
-
-def slugify(name: str) -> str:
-    """Convert setting name to URL slug."""
-    return name.lower().replace("_", "-")
-
-
-def clean_rst_markup(text: str) -> str:
-    """Convert RST markup to markdown-ish format."""
-    # Convert RST inline code to markdown
-    text = re.sub(r"``([^`]+)``", r"`\1`", text)
-    # Convert RST references to plain text or links
-    text = re.sub(r":setting:`([^`<]+)`", r"`\1`", text)
-    text = re.sub(r":setting:`[^<]*<([^>]+)>`", r"`\1`", text)
-    text = re.sub(r":class:`~?([^`]+)`", r"`\1`", text)
-    text = re.sub(r":meth:`~?([^`]+)`", r"`\1()`", text)
-    text = re.sub(r":exc:`~?([^`]+)`", r"`\1`", text)
-    text = re.sub(r":ref:`([^`<]+)`", r"\1", text)
-    text = re.sub(r":ref:`[^<]*<([^>]+)>`", r"\1", text)
-    text = re.sub(r":doc:`[^<]*<([^>]+)>`", r"\1", text)
-    text = re.sub(r":doc:`([^`]+)`", r"\1", text)
-    text = re.sub(r":mod:`([^`]+)`", r"`\1`", text)
-    text = re.sub(r":func:`([^`]+)`", r"`\1()`", text)
-    text = re.sub(r":attr:`([^`]+)`", r"`\1`", text)
-    text = re.sub(r":tfilter:`[^<]*<([^>]+)>`", r"\1", text)
-    text = re.sub(r":tfilter:`([^`]+)`", r"\1", text)
-    # Remove .. versionchanged:: and similar
-    text = re.sub(r"\.\. versionchanged::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    text = re.sub(r"\.\. versionadded::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    text = re.sub(r"\.\. deprecated::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    text = re.sub(r"\.\. note::\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    text = re.sub(r"\.\. warning::\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    # Clean up external links
-    text = re.sub(r"`([^`]+)`_", r"\1", text)
-    text = re.sub(r"\.\. _[^:]+: https?://[^\n]+\n?", "", text)
-    return text.strip()
-
-
-def strip_trailing_pointers(text: str) -> str:
-    """Remove trailing sentences that point to other documentation sections."""
-    patterns = [
-        r"The following .* are available.*",
-        r"See below for .*",
-        r"Example::",
-        r"Here's an example with .*",
-        r"Here's a setup that .*",
-        r"For more info, see .*",
-    ]
-
-    for pattern in patterns:
-        text = re.sub(rf"\n*{pattern}\s*$", "", text, flags=re.IGNORECASE | re.DOTALL)
-
-    return text.strip()
-
-
-def extract_code_example(text: str) -> str:
-    """Extract code example from RST text."""
-    # Look for code blocks (lines after ::)
-    code_blocks = []
-    lines = text.split("\n")
-    in_code_block = False
-    code_indent = 0
-    current_block = []
-
-    for i, line in enumerate(lines):
-        if not in_code_block:
-            # Check if this line ends with :: (code block start)
-            if line.rstrip().endswith("::"):
-                in_code_block = True
-                current_block = []
-                continue
-        else:
-            # In code block
-            if line.strip() == "":
-                if current_block:
-                    current_block.append("")
-                continue
-
-            # Determine indent of first code line
-            if current_block == [] and line.strip():
-                code_indent = len(line) - len(line.lstrip())
-
-            # Check if we're still in the code block
-            if line.strip() and (len(line) - len(line.lstrip())) < code_indent:
-                # End of code block
-                if current_block:
-                    # Remove trailing empty lines
-                    while current_block and current_block[-1] == "":
-                        current_block.pop()
-                    code_blocks.append("\n".join(current_block))
-                in_code_block = False
-                current_block = []
-                code_indent = 0
-            else:
-                # Still in code block - remove the indent
-                if line.strip():
-                    current_block.append(
-                        line[code_indent:] if len(line) >= code_indent else line
-                    )
-                elif current_block:  # Only add empty lines if we have content
-                    current_block.append("")
-
-    # Handle code block at end of text
-    if current_block:
-        while current_block and current_block[-1] == "":
-            current_block.pop()
-        code_blocks.append("\n".join(current_block))
-
-    # Return the first substantial code block
-    for block in code_blocks:
-        if len(block.strip()) > 10:
-            return block.strip()
-
-    return ""
 
 
 def determine_category(label: str, nested_in: Optional[str]) -> str:
@@ -389,14 +282,14 @@ def main():
 
     # Download or read input file
     if args.download:
-        print(f"Downloading from {SETTINGS_URL}...", file=sys.stderr)
-        with urllib.request.urlopen(SETTINGS_URL) as response:
-            content = response.read().decode("utf-8")
-        # Optionally save the downloaded file
-        input_path = Path(args.input)
-        input_path.write_text(content, encoding="utf-8")
-        print(f"Saved to {args.input}", file=sys.stderr)
+        content = download_file(SETTINGS_URL, Path(args.input))
     else:
+        if not Path(args.input).exists():
+            print(
+                f"Error: {args.input} not found. Use --download to fetch it.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         with open(args.input, "r", encoding="utf-8") as f:
             content = f.read()
 

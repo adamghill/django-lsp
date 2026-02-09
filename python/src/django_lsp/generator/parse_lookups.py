@@ -13,9 +13,14 @@ import argparse
 import json
 import re
 import sys
-import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
+
+from django_lsp.generator.common import (
+    clean_rst_markup,
+    download_file,
+    extract_code_example,
+)
 
 QUERYSETS_URL = (
     "https://raw.githubusercontent.com/django/django/main/docs/ref/models/querysets.txt"
@@ -28,85 +33,6 @@ class DjangoLookup:
     description: str = ""
     example: str = ""
     docs_url: str = ""
-
-
-def slugify(name: str) -> str:
-    """Convert lookup name to URL slug."""
-    return name.lower().replace("_", "-")
-
-
-def clean_rst_markup(text: str) -> str:
-    """Convert RST markup to markdown-ish format."""
-    # Convert RST inline code to markdown
-    text = re.sub(r"``([^`]+)``", r"`\1`", text)
-    # Convert RST references to plain text or links
-    text = re.sub(r":setting:`([^`<]+)`", r"`\1`", text)
-    text = re.sub(r":class:`~?([^`]+)`", r"`\1`", text)
-    text = re.sub(r":meth:`~?([^`]+)`", r"`\1()`", text)
-    text = re.sub(r":ref:`([^`<]+)`", r"\1", text)
-    text = re.sub(r":doc:`[^<]*<([^>]+)>`", r"\1", text)
-    text = re.sub(r":doc:`([^`]+)`", r"\1", text)
-    text = re.sub(r":mod:`([^`]+)`", r"`\1`", text)
-    text = re.sub(r":func:`([^`]+)`", r"`\1()`", text)
-    text = re.sub(r":attr:`([^`]+)`", r"`\1`", text)
-    # Remove .. versionchanged:: and similar
-    text = re.sub(r"\.\. versionchanged::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-    text = re.sub(r"\.\. versionadded::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*", "", text)
-
-    # Handle direct text blocks (remove directives but keep indentation if it's a code block)
-    text = re.sub(r"\.\. admonition::[^\n]*\n", "", text)
-    text = re.sub(r"\.\. warning::[^\n]*\n", "", text)
-    text = re.sub(r"\.\. note::[^\n]*\n", "", text)
-
-    return text.strip()
-
-
-def extract_code_example(text: str) -> str:
-    """Extract code example from RST text."""
-    # Look for code blocks (lines after :: or .. code-block::)
-    code_blocks = []
-    lines = text.split("\n")
-    in_code_block = False
-    code_indent = 4
-    current_block = []
-
-    for line in lines:
-        if not in_code_block:
-            if line.rstrip().endswith("::") or ".. code-block::" in line:
-                in_code_block = True
-                current_block = []
-                continue
-        else:
-            if not line.strip():
-                if current_block:
-                    current_block.append("")
-                continue
-
-            # Use the indentation of the first non-empty line
-            if not current_block:
-                code_indent = len(line) - len(line.lstrip())
-                if code_indent == 0:  # Not actually indented, end of block
-                    in_code_block = False
-                    continue
-
-            if (len(line) - len(line.lstrip())) < code_indent:
-                # End of code block
-                if current_block:
-                    code_blocks.append("\n".join(current_block).strip())
-                in_code_block = False
-                current_block = []
-            else:
-                current_block.append(line[code_indent:])
-
-    if current_block:
-        code_blocks.append("\n".join(current_block).strip())
-
-    # Return the first substantial code block
-    for block in code_blocks:
-        if len(block.strip()) > 10:
-            return block.strip()
-
-    return ""
 
 
 def parse_querysets_rst(content: str) -> list[DjangoLookup]:
@@ -195,10 +121,7 @@ def main():
     args = parser.parse_args()
 
     if args.download:
-        print(f"Downloading from {QUERYSETS_URL}...", file=sys.stderr)
-        with urllib.request.urlopen(QUERYSETS_URL) as response:
-            content = response.read().decode("utf-8")
-        Path(args.input).write_text(content, encoding="utf-8")
+        content = download_file(QUERYSETS_URL, Path(args.input))
     else:
         if not Path(args.input).exists():
             print(

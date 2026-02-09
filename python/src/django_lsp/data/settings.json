@@ -36,42 +36,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#append-slash"
   },
   {
-    "label": "AUTHENTICATION_BACKENDS",
-    "description": "A list of authentication backend classes (as strings) to use when attempting to\nauthenticate a user. See the authentication-backends for details.",
-    "example": "",
-    "default": "['django.contrib.auth.backends.ModelBackend']",
-    "category": "Core",
-    "name": "AUTHENTICATION_BACKENDS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#authentication-backends"
-  },
-  {
-    "label": "AUTH_PASSWORD_VALIDATORS",
-    "description": "The list of validators that are used to check the strength of user's passwords.\nSee password-validation for more details. By default, no validation is\nperformed and all passwords are accepted.",
-    "example": "",
-    "default": "[] (Empty list)",
-    "category": "Auth",
-    "name": "AUTH_PASSWORD_VALIDATORS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators"
-  },
-  {
-    "label": "AUTH_USER_MODEL",
-    "description": "The model to use to represent a User. See auth-custom-user.",
-    "example": "You cannot change the AUTH_USER_MODEL setting during the lifetime of\na project (i.e. once you have made and migrated models that depend on it)\nwithout serious effort. It is intended to be set at the project start,\nand the model it refers to must be available in the first migration of\nthe app that it lives in.\nSee :ref:`auth-custom-user` for more details.",
-    "default": "'auth.User'",
-    "category": "Auth",
-    "name": "AUTH_USER_MODEL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#auth-user-model"
-  },
-  {
-    "label": "BASE_DIR",
-    "description": "The absolute filesystem path to the directory containing your Django project. This is typically the directory containing `manage.py`. It's used as the base for constructing other paths like `DATABASES.NAME` for SQLite, `STATICFILES_DIRS`, and template directories.\n\nThis setting is defined in the default project template created by `django-admin startproject`, but is not an official Django setting.",
-    "example": "from pathlib import Path\n\nBASE_DIR = Path(__file__).resolve().parent.parent",
-    "default": "Path(__file__).resolve().parent.parent",
-    "category": "Project",
-    "name": "BASE_DIR",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/"
-  },
-  {
     "label": "CACHES",
     "description": "{\n        \"default\": {\n            \"BACKEND\": \"django.core.cache.backends.locmem.LocMemCache\",\n        }\n    }\n\nA dictionary containing the settings for all caches to be used with\nDjango. It is a nested dictionary whose contents maps cache aliases\nto a dictionary containing the options for an individual cache.\n\nThe `CACHES` setting must configure a `default` cache;\nany number of additional caches may also be specified. If you\nare using a cache backend other than the local memory cache, or\nyou need to define multiple caches, other options will be required.",
     "example": "{\n    \"default\": {\n        \"BACKEND\": \"django.core.cache.backends.locmem.LocMemCache\",\n    }\n}",
@@ -236,6 +200,15 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-secure"
   },
   {
+    "label": "CSRF_USE_SESSIONS",
+    "description": "Whether to store the CSRF token in the user's session instead of in a cookie.\nIt requires the use of `django.contrib.sessions`.\n\nStoring the CSRF token in a cookie (Django's default) is safe, but storing it\nin the session is common practice in other web frameworks and therefore\nsometimes demanded by security auditors.\n\nSince the error-views require the CSRF token,\n`django.contrib.sessions.middleware.SessionMiddleware` must appear in\n`MIDDLEWARE` before any middleware that may raise an exception to\ntrigger an error view (such as `django.core.exceptions.PermissionDenied`)\nif you're using `CSRF_USE_SESSIONS`. See middleware-ordering.",
+    "example": "",
+    "default": "False",
+    "category": "Security",
+    "name": "CSRF_USE_SESSIONS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#csrf-use-sessions"
+  },
+  {
     "label": "CSRF_FAILURE_VIEW",
     "description": "A dotted path to the view function to be used when an incoming request is\nrejected by the /ref/csrf. The function should have\nthis signature::\n\n    def csrf_failure(request, reason=\"\"): ...\n\nwhere `reason` is a short message (intended for developers or logging, not\nfor end users) indicating the reason the request was rejected. It should return\nan `django.http.HttpResponseForbidden`.\n\n`django.views.csrf.csrf_failure()` accepts an additional `template_name`\nparameter that defaults to `'403_csrf.html'`. If a template with that name\nexists, it will be used to render the page.",
     "example": "def csrf_failure(request, reason=\"\"): ...",
@@ -261,15 +234,6 @@
     "category": "Security",
     "name": "CSRF_TRUSTED_ORIGINS",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#csrf-trusted-origins"
-  },
-  {
-    "label": "CSRF_USE_SESSIONS",
-    "description": "Whether to store the CSRF token in the user's session instead of in a cookie.\nIt requires the use of `django.contrib.sessions`.\n\nStoring the CSRF token in a cookie (Django's default) is safe, but storing it\nin the session is common practice in other web frameworks and therefore\nsometimes demanded by security auditors.\n\nSince the error-views require the CSRF token,\n`django.contrib.sessions.middleware.SessionMiddleware` must appear in\n`MIDDLEWARE` before any middleware that may raise an exception to\ntrigger an error view (such as `django.core.exceptions.PermissionDenied`)\nif you're using `CSRF_USE_SESSIONS`. See middleware-ordering.",
-    "example": "",
-    "default": "False",
-    "category": "Security",
-    "name": "CSRF_USE_SESSIONS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#csrf-use-sessions"
   },
   {
     "label": "DATABASES",
@@ -609,15 +573,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#databases"
   },
   {
-    "label": "DATABASE_ROUTERS",
-    "description": "The list of routers that will be used to determine which database\nto use when performing a database query.\n\nSee the documentation on topics-db-multi-db-routing.",
-    "example": "",
-    "default": "[] (Empty list)",
-    "category": "Databases",
-    "name": "DATABASE_ROUTERS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#database-routers"
-  },
-  {
     "label": "DATA_UPLOAD_MAX_MEMORY_SIZE",
     "description": "The maximum size in bytes that a request body may be before a\n`django.core.exceptions.SuspiciousOperation` (`RequestDataTooBig`) is\nraised. The check is done when accessing `request.body` or `request.POST`\nand is calculated against the total request size excluding any file upload\ndata. You can set this to `None` to disable the check. Applications that are\nexpected to receive unusually large form posts should tune this setting.\n\nThe amount of request data is correlated to the amount of memory needed to\nprocess the request and populate the GET and POST dictionaries. Large requests\ncould be used as a denial-of-service attack vector if left unchecked. Since web\nservers don't typically perform deep request inspection, it's not possible to\nperform a similar check at that level.\n\nSee also `FILE_UPLOAD_MAX_MEMORY_SIZE`.",
     "example": "",
@@ -645,22 +600,13 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#data-upload-max-number-files"
   },
   {
-    "label": "DATETIME_FORMAT",
-    "description": "The default formatting to use for displaying datetime fields in any part of the\nsystem. Note that the locale-dictated format has higher precedence and will be\napplied instead. See date.\n\nSee also `DATE_FORMAT`, `TIME_FORMAT` and\n`SHORT_DATETIME_FORMAT`.",
+    "label": "DATABASE_ROUTERS",
+    "description": "The list of routers that will be used to determine which database\nto use when performing a database query.\n\nSee the documentation on topics-db-multi-db-routing.",
     "example": "",
-    "default": "'N j, Y, P' (e.g. Feb. 4, 2003, 4 p.m.)",
-    "category": "i18n",
-    "name": "DATETIME_FORMAT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#datetime-format"
-  },
-  {
-    "label": "DATETIME_INPUT_FORMATS",
-    "description": "[\n        \"%Y-%m-%d %H:%M:%S\",  # '2006-10-25 14:30:59'\n        \"%Y-%m-%d %H:%M:%S.%f\",  # '2006-10-25 14:30:59.000200'\n        \"%Y-%m-%d %H:%M\",  # '2006-10-25 14:30'\n        \"%m/%d/%Y %H:%M:%S\",  # '10/25/2006 14:30:59'\n        \"%m/%d/%Y %H:%M:%S.%f\",  # '10/25/2006 14:30:59.000200'\n        \"%m/%d/%Y %H:%M\",  # '10/25/2006 14:30'\n        \"%m/%d/%y %H:%M:%S\",  # '10/25/06 14:30:59'\n        \"%m/%d/%y %H:%M:%S.%f\",  # '10/25/06 14:30:59.000200'\n        \"%m/%d/%y %H:%M\",  # '10/25/06 14:30'\n    ]\n\nA list of formats that will be accepted when inputting data on a datetime\nfield. Formats will be tried in order, using the first valid one. Note that\nthese format strings use Python's strftime-strptime-behavior, not the format strings from the date\ntemplate filter. Date-only formats are not included as datetime fields will\nautomatically try `DATE_INPUT_FORMATS` in last resort.\n\nThe locale-dictated format has higher precedence and will be applied instead.\n\nSee also `DATE_INPUT_FORMATS` and `TIME_INPUT_FORMATS`.",
-    "example": "[\n    \"%Y-%m-%d %H:%M:%S\",  # '2006-10-25 14:30:59'\n    \"%Y-%m-%d %H:%M:%S.%f\",  # '2006-10-25 14:30:59.000200'\n    \"%Y-%m-%d %H:%M\",  # '2006-10-25 14:30'\n    \"%m/%d/%Y %H:%M:%S\",  # '10/25/2006 14:30:59'\n    \"%m/%d/%Y %H:%M:%S.%f\",  # '10/25/2006 14:30:59.000200'\n    \"%m/%d/%Y %H:%M\",  # '10/25/2006 14:30'\n    \"%m/%d/%y %H:%M:%S\",  # '10/25/06 14:30:59'\n    \"%m/%d/%y %H:%M:%S.%f\",  # '10/25/06 14:30:59.000200'\n    \"%m/%d/%y %H:%M\",  # '10/25/06 14:30'\n]",
-    "default": ":",
-    "category": "i18n",
-    "name": "DATETIME_INPUT_FORMATS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#datetime-input-formats"
+    "default": "[] (Empty list)",
+    "category": "Databases",
+    "name": "DATABASE_ROUTERS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#database-routers"
   },
   {
     "label": "DATE_FORMAT",
@@ -679,6 +625,24 @@
     "category": "i18n",
     "name": "DATE_INPUT_FORMATS",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#date-input-formats"
+  },
+  {
+    "label": "DATETIME_FORMAT",
+    "description": "The default formatting to use for displaying datetime fields in any part of the\nsystem. Note that the locale-dictated format has higher precedence and will be\napplied instead. See date.\n\nSee also `DATE_FORMAT`, `TIME_FORMAT` and\n`SHORT_DATETIME_FORMAT`.",
+    "example": "",
+    "default": "'N j, Y, P' (e.g. Feb. 4, 2003, 4 p.m.)",
+    "category": "i18n",
+    "name": "DATETIME_FORMAT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#datetime-format"
+  },
+  {
+    "label": "DATETIME_INPUT_FORMATS",
+    "description": "[\n        \"%Y-%m-%d %H:%M:%S\",  # '2006-10-25 14:30:59'\n        \"%Y-%m-%d %H:%M:%S.%f\",  # '2006-10-25 14:30:59.000200'\n        \"%Y-%m-%d %H:%M\",  # '2006-10-25 14:30'\n        \"%m/%d/%Y %H:%M:%S\",  # '10/25/2006 14:30:59'\n        \"%m/%d/%Y %H:%M:%S.%f\",  # '10/25/2006 14:30:59.000200'\n        \"%m/%d/%Y %H:%M\",  # '10/25/2006 14:30'\n        \"%m/%d/%y %H:%M:%S\",  # '10/25/06 14:30:59'\n        \"%m/%d/%y %H:%M:%S.%f\",  # '10/25/06 14:30:59.000200'\n        \"%m/%d/%y %H:%M\",  # '10/25/06 14:30'\n    ]\n\nA list of formats that will be accepted when inputting data on a datetime\nfield. Formats will be tried in order, using the first valid one. Note that\nthese format strings use Python's strftime-strptime-behavior, not the format strings from the date\ntemplate filter. Date-only formats are not included as datetime fields will\nautomatically try `DATE_INPUT_FORMATS` in last resort.\n\nThe locale-dictated format has higher precedence and will be applied instead.\n\nSee also `DATE_INPUT_FORMATS` and `TIME_INPUT_FORMATS`.",
+    "example": "[\n    \"%Y-%m-%d %H:%M:%S\",  # '2006-10-25 14:30:59'\n    \"%Y-%m-%d %H:%M:%S.%f\",  # '2006-10-25 14:30:59.000200'\n    \"%Y-%m-%d %H:%M\",  # '2006-10-25 14:30'\n    \"%m/%d/%Y %H:%M:%S\",  # '10/25/2006 14:30:59'\n    \"%m/%d/%Y %H:%M:%S.%f\",  # '10/25/2006 14:30:59.000200'\n    \"%m/%d/%Y %H:%M\",  # '10/25/2006 14:30'\n    \"%m/%d/%y %H:%M:%S\",  # '10/25/06 14:30:59'\n    \"%m/%d/%y %H:%M:%S.%f\",  # '10/25/06 14:30:59.000200'\n    \"%m/%d/%y %H:%M\",  # '10/25/06 14:30'\n]",
+    "default": ":",
+    "category": "i18n",
+    "name": "DATETIME_INPUT_FORMATS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#datetime-input-formats"
   },
   {
     "label": "DEBUG",
@@ -834,6 +798,42 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-port"
   },
   {
+    "label": "EMAIL_SUBJECT_PREFIX",
+    "description": "Subject-line prefix for email messages sent with\n`django.core.mail.mail_admins` or `django.core.mail.mail_managers`. You'll\nprobably want to include the trailing space.",
+    "example": "",
+    "default": "'[Django] '",
+    "category": "Email",
+    "name": "EMAIL_SUBJECT_PREFIX",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-subject-prefix"
+  },
+  {
+    "label": "EMAIL_USE_LOCALTIME",
+    "description": "Whether to send the SMTP `Date` header of email messages in the local time\nzone (`True`) or in UTC (`False`).",
+    "example": "",
+    "default": "False",
+    "category": "Email",
+    "name": "EMAIL_USE_LOCALTIME",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-localtime"
+  },
+  {
+    "label": "EMAIL_USE_TLS",
+    "description": "Whether to use a TLS (secure) connection when talking to the SMTP server.\nThis is used for explicit TLS connections, generally on port 587. If you are\nexperiencing hanging connections, see the implicit TLS setting\n`EMAIL_USE_SSL`.",
+    "example": "",
+    "default": "False",
+    "category": "Email",
+    "name": "EMAIL_USE_TLS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-tls"
+  },
+  {
+    "label": "EMAIL_USE_SSL",
+    "description": "Whether to use an implicit TLS (secure) connection when talking to the SMTP\nserver. In most email documentation this type of TLS connection is referred\nto as SSL. It is generally used on port 465. If you are experiencing problems,\nsee the explicit TLS setting `EMAIL_USE_TLS`.\n\nNote that `EMAIL_USE_TLS`/`EMAIL_USE_SSL` are mutually\nexclusive, so only set one of those settings to `True`.",
+    "example": "",
+    "default": "False",
+    "category": "Email",
+    "name": "EMAIL_USE_SSL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-ssl"
+  },
+  {
     "label": "EMAIL_SSL_CERTFILE",
     "description": "If `EMAIL_USE_SSL` or `EMAIL_USE_TLS` is `True` and the\nsecure connection to the SMTP server requires client authentication, use this\nsetting to specify the path to a PEM-formatted certificate chain file, which\nmust be used in conjunction with `EMAIL_SSL_KEYFILE`.\n\n`EMAIL_SSL_CERTFILE` should not be used with a self-signed server certificate\nor a certificate from a private certificate authority (CA). In such cases, the\nserver's certificate (or the root certificate of the private CA) should be\ninstalled into the system's CA bundle. This can be done by following\nplatform-specific instructions for installing a root CA certificate,\nor by using OpenSSL's `SSL_CERT_FILE` or `SSL_CERT_DIR` environment\nvariables to specify a custom certificate bundle (if modifying the system\nbundle is not possible or desired).\n\nFor more complex scenarios, the SMTP\n`django.core.mail.backends.smtp.EmailBackend` can be subclassed to add\nroot certificates to its `ssl_context` using\n`python:ssl.SSLContext.load_verify_locations()`.",
     "example": "",
@@ -852,15 +852,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-ssl-keyfile"
   },
   {
-    "label": "EMAIL_SUBJECT_PREFIX",
-    "description": "Subject-line prefix for email messages sent with\n`django.core.mail.mail_admins` or `django.core.mail.mail_managers`. You'll\nprobably want to include the trailing space.",
-    "example": "",
-    "default": "'[Django] '",
-    "category": "Email",
-    "name": "EMAIL_SUBJECT_PREFIX",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-subject-prefix"
-  },
-  {
     "label": "EMAIL_TIMEOUT",
     "description": "Specifies a timeout in seconds for blocking operations like the connection\nattempt.",
     "example": "",
@@ -868,42 +859,6 @@
     "category": "Email",
     "name": "EMAIL_TIMEOUT",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-timeout"
-  },
-  {
-    "label": "EMAIL_USE_LOCALTIME",
-    "description": "Whether to send the SMTP `Date` header of email messages in the local time\nzone (`True`) or in UTC (`False`).",
-    "example": "",
-    "default": "False",
-    "category": "Email",
-    "name": "EMAIL_USE_LOCALTIME",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-localtime"
-  },
-  {
-    "label": "EMAIL_USE_SSL",
-    "description": "Whether to use an implicit TLS (secure) connection when talking to the SMTP\nserver. In most email documentation this type of TLS connection is referred\nto as SSL. It is generally used on port 465. If you are experiencing problems,\nsee the explicit TLS setting `EMAIL_USE_TLS`.\n\nNote that `EMAIL_USE_TLS`/`EMAIL_USE_SSL` are mutually\nexclusive, so only set one of those settings to `True`.",
-    "example": "",
-    "default": "False",
-    "category": "Email",
-    "name": "EMAIL_USE_SSL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-ssl"
-  },
-  {
-    "label": "EMAIL_USE_TLS",
-    "description": "Whether to use a TLS (secure) connection when talking to the SMTP server.\nThis is used for explicit TLS connections, generally on port 587. If you are\nexperiencing hanging connections, see the implicit TLS setting\n`EMAIL_USE_SSL`.",
-    "example": "",
-    "default": "False",
-    "category": "Email",
-    "name": "EMAIL_USE_TLS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#email-use-tls"
-  },
-  {
-    "label": "FILE_UPLOAD_DIRECTORY_PERMISSIONS",
-    "description": "The numeric mode to apply to directories created in the process of uploading\nfiles.\n\nThis setting also determines the default permissions for collected static\ndirectories when using the :djadmin:`collectstatic` management command. See\n:djadmin:`collectstatic` for details on overriding it.\n\nThis value mirrors the functionality and caveats of the\n`FILE_UPLOAD_PERMISSIONS` setting.",
-    "example": "",
-    "default": "None",
-    "category": "Core",
-    "name": "FILE_UPLOAD_DIRECTORY_PERMISSIONS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#file-upload-directory-permissions"
   },
   {
     "label": "FILE_UPLOAD_HANDLERS",
@@ -922,6 +877,15 @@
     "category": "Core",
     "name": "FILE_UPLOAD_MAX_MEMORY_SIZE",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#file-upload-max-memory-size"
+  },
+  {
+    "label": "FILE_UPLOAD_DIRECTORY_PERMISSIONS",
+    "description": "The numeric mode to apply to directories created in the process of uploading\nfiles.\n\nThis setting also determines the default permissions for collected static\ndirectories when using the :djadmin:`collectstatic` management command. See\n:djadmin:`collectstatic` for details on overriding it.\n\nThis value mirrors the functionality and caveats of the\n`FILE_UPLOAD_PERMISSIONS` setting.",
+    "example": "",
+    "default": "None",
+    "category": "Core",
+    "name": "FILE_UPLOAD_DIRECTORY_PERMISSIONS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#file-upload-directory-permissions"
   },
   {
     "label": "FILE_UPLOAD_PERMISSIONS",
@@ -969,15 +933,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#force-script-name"
   },
   {
-    "label": "FORMAT_MODULE_PATH",
-    "description": "A full Python path to a Python package that contains custom format definitions\nfor project locales. If not `None`, Django will check for a `formats.py`\nfile, under the directory named as the current locale, and will use the\nformats defined in this file.\n\nThe name of the directory containing the format definitions is expected to be\nnamed using :term:`locale name` notation, for example `de`, `pt_BR`,\n`en_US`, etc.\n\nFor example, if `FORMAT_MODULE_PATH` is set to `mysite.formats`,\nand current language is `en` (English), Django will expect a directory tree\nlike:",
-    "example": "FORMAT_MODULE_PATH = [\n    \"mysite.formats\",\n    \"some_app.formats\",\n]",
-    "default": "None",
-    "category": "Core",
-    "name": "FORMAT_MODULE_PATH",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#format-module-path"
-  },
-  {
     "label": "FORM_RENDERER",
     "description": "The class that renders forms and form widgets. It must implement\nlow-level-widget-render-api. Included form\nrenderers are:\n\n* `'``django.forms.renderers.DjangoTemplates`\\ `'`\n* `'``django.forms.renderers.Jinja2`\\ `'`\n* `'``django.forms.renderers.TemplatesSetting`\\ `'`",
     "example": "",
@@ -985,6 +940,15 @@
     "category": "Core",
     "name": "FORM_RENDERER",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#form-renderer"
+  },
+  {
+    "label": "FORMAT_MODULE_PATH",
+    "description": "A full Python path to a Python package that contains custom format definitions\nfor project locales. If not `None`, Django will check for a `formats.py`\nfile, under the directory named as the current locale, and will use the\nformats defined in this file.\n\nThe name of the directory containing the format definitions is expected to be\nnamed using :term:`locale name` notation, for example `de`, `pt_BR`,\n`en_US`, etc.\n\nFor example, if `FORMAT_MODULE_PATH` is set to `mysite.formats`,\nand current language is `en` (English), Django will expect a directory tree\nlike:",
+    "example": "mysite/\n    formats/\n        __init__.py\n        en/\n            __init__.py\n            formats.py",
+    "default": "None",
+    "category": "Core",
+    "name": "FORMAT_MODULE_PATH",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#format-module-path"
   },
   {
     "label": "IGNORABLE_404_URLS",
@@ -1012,24 +976,6 @@
     "category": "Core",
     "name": "INTERNAL_IPS",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#internal-ips"
-  },
-  {
-    "label": "LANGUAGES",
-    "description": "",
-    "example": "from django.utils.translation import gettext_lazy as _\n\nLANGUAGES = [\n    (\"de\", _(\"German\")),\n    (\"en\", _(\"English\")),\n]",
-    "default": "A list of all available languages. This list is continually growing and including a copy here would inevitably become rapidly out of date. You can see the current list of translated languages by looking in :source:`django/conf/global_settings.py`.",
-    "category": "i18n",
-    "name": "LANGUAGES",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#languages"
-  },
-  {
-    "label": "LANGUAGES_BIDI",
-    "description": "",
-    "example": "",
-    "default": "A list of all language codes that are written right-to-left. You can see the current list of these languages by looking in :source:`django/conf/global_settings.py`.",
-    "category": "i18n",
-    "name": "LANGUAGES_BIDI",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#languages-bidi"
   },
   {
     "label": "LANGUAGE_CODE",
@@ -1104,6 +1050,24 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#language-cookie-secure"
   },
   {
+    "label": "LANGUAGES",
+    "description": "",
+    "example": "from django.utils.translation import gettext_lazy as _\n\nLANGUAGES = [\n    (\"de\", _(\"German\")),\n    (\"en\", _(\"English\")),\n]",
+    "default": "A list of all available languages. This list is continually growing and including a copy here would inevitably become rapidly out of date. You can see the current list of translated languages by looking in :source:`django/conf/global_settings.py`.",
+    "category": "i18n",
+    "name": "LANGUAGES",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#languages"
+  },
+  {
+    "label": "LANGUAGES_BIDI",
+    "description": "",
+    "example": "",
+    "default": "A list of all language codes that are written right-to-left. You can see the current list of these languages by looking in :source:`django/conf/global_settings.py`.",
+    "category": "i18n",
+    "name": "LANGUAGES_BIDI",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#languages-bidi"
+  },
+  {
     "label": "LOCALE_PATHS",
     "description": "A list of directories where Django looks for translation files.\nSee how-django-discovers-translations.\n\nExample::\n\n    LOCALE_PATHS = [\n        \"/home/www/project/common_files/locale\",\n        \"/var/local/translations/locale\",\n    ]\n\nDjango will look within each of these paths for the\n`<locale_code>/LC_MESSAGES` directories containing the actual translation\nfiles.",
     "example": "LOCALE_PATHS = [\n    \"/home/www/project/common_files/locale\",\n    \"/var/local/translations/locale\",\n]",
@@ -1131,33 +1095,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#logging-config"
   },
   {
-    "label": "LOGIN_REDIRECT_URL",
-    "description": "The URL or naming-url-patterns where requests are\nredirected after login when the `django.contrib.auth.views.LoginView`\ndoesn't get a `next` GET parameter.",
-    "example": "",
-    "default": "'/accounts/profile/'",
-    "category": "Auth",
-    "name": "LOGIN_REDIRECT_URL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#login-redirect-url"
-  },
-  {
-    "label": "LOGIN_URL",
-    "description": "The URL or naming-url-patterns where requests are\nredirected for login when using the\n`~django.contrib.auth.decorators.login_required()` decorator,\n`django.contrib.auth.mixins.LoginRequiredMixin`,\n`django.contrib.auth.mixins.AccessMixin`, or when\n`django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.",
-    "example": "",
-    "default": "'/accounts/login/'",
-    "category": "Auth",
-    "name": "LOGIN_URL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#login-url"
-  },
-  {
-    "label": "LOGOUT_REDIRECT_URL",
-    "description": "The URL or naming-url-patterns where requests are\nredirected after logout if `django.contrib.auth.views.LogoutView`\ndoesn't have a `next_page` attribute.\n\nIf `None`, no redirect will be performed and the logout view will be\nrendered.",
-    "example": "",
-    "default": "None",
-    "category": "Auth",
-    "name": "LOGOUT_REDIRECT_URL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#logout-redirect-url"
-  },
-  {
     "label": "MANAGERS",
     "description": "A list in the same format as `ADMINS` that specifies who should get\nbroken link notifications when\n`django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.",
     "example": "",
@@ -1183,33 +1120,6 @@
     "category": "Static Files",
     "name": "MEDIA_URL",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#media-url"
-  },
-  {
-    "label": "MESSAGE_LEVEL",
-    "description": "Sets the minimum message level that will be recorded by the messages\nframework. See message-level for more details.",
-    "example": "from django.contrib.messages import constants as message_constants\n\nMESSAGE_LEVEL = message_constants.DEBUG",
-    "default": "messages.INFO",
-    "category": "Core",
-    "name": "MESSAGE_LEVEL",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-level"
-  },
-  {
-    "label": "MESSAGE_STORAGE",
-    "description": "Controls where Django stores message data. Valid values are:\n\n* `'django.contrib.messages.storage.fallback.FallbackStorage'`\n* `'django.contrib.messages.storage.session.SessionStorage'`\n* `'django.contrib.messages.storage.cookie.CookieStorage'`\n\nSee message-storage-backends for more\ndetails.\n\nThe backends that use cookies --\n`django.contrib.messages.storage.cookie.CookieStorage` and\n`django.contrib.messages.storage.fallback.FallbackStorage` --\nuse the value of `SESSION_COOKIE_DOMAIN`,\n`SESSION_COOKIE_SECURE` and `SESSION_COOKIE_HTTPONLY` when\nsetting their cookies.",
-    "example": "",
-    "default": "'django.contrib.messages.storage.fallback.FallbackStorage'",
-    "category": "Core",
-    "name": "MESSAGE_STORAGE",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-storage"
-  },
-  {
-    "label": "MESSAGE_TAGS",
-    "description": "{\n        messages.DEBUG: \"debug\",\n        messages.INFO: \"info\",\n        messages.SUCCESS: \"success\",\n        messages.WARNING: \"warning\",\n        messages.ERROR: \"error\",\n    }\n\nThis sets the mapping of message level to message tag, which is typically\nrendered as a CSS class in HTML. If you specify a value, it will extend\nthe default. This means you only have to specify those values which you need\nto override. See message-displaying above for more details.",
-    "example": "{\n    messages.DEBUG: \"debug\",\n    messages.INFO: \"info\",\n    messages.SUCCESS: \"success\",\n    messages.WARNING: \"warning\",\n    messages.ERROR: \"error\",\n}",
-    "default": ":",
-    "category": "Core",
-    "name": "MESSAGE_TAGS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-tags"
   },
   {
     "label": "MIDDLEWARE",
@@ -1246,24 +1156,6 @@
     "category": "Core",
     "name": "NUMBER_GROUPING",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#number-grouping"
-  },
-  {
-    "label": "PASSWORD_HASHERS",
-    "description": "[\n        \"django.contrib.auth.hashers.PBKDF2PasswordHasher\",\n        \"django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher\",\n        \"django.contrib.auth.hashers.Argon2PasswordHasher\",\n        \"django.contrib.auth.hashers.BCryptSHA256PasswordHasher\",\n        \"django.contrib.auth.hashers.ScryptPasswordHasher\",\n    ]",
-    "example": "[\n    \"django.contrib.auth.hashers.PBKDF2PasswordHasher\",\n    \"django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher\",\n    \"django.contrib.auth.hashers.Argon2PasswordHasher\",\n    \"django.contrib.auth.hashers.BCryptSHA256PasswordHasher\",\n    \"django.contrib.auth.hashers.ScryptPasswordHasher\",\n]",
-    "default": ":",
-    "category": "Auth",
-    "name": "PASSWORD_HASHERS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#password-hashers"
-  },
-  {
-    "label": "PASSWORD_RESET_TIMEOUT",
-    "description": "The number of seconds a password reset link is valid for.\n\nUsed by the `django.contrib.auth.views.PasswordResetConfirmView`.",
-    "example": "Reducing the value of this timeout doesn't make any difference to the\nability of an attacker to brute-force a password reset token. Tokens are\ndesigned to be safe from brute-forcing without any timeout.\n\nThis timeout exists to protect against some unlikely attack scenarios, such\nas someone gaining access to email archives that may contain old, unused\npassword reset tokens.",
-    "default": "259200 (3 days, in seconds)",
-    "category": "Auth",
-    "name": "PASSWORD_RESET_TIMEOUT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#password-reset-timeout"
   },
   {
     "label": "PREPEND_WWW",
@@ -1428,6 +1320,379 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#server-email"
   },
   {
+    "label": "SHORT_DATE_FORMAT",
+    "description": "An available formatting that can be used for displaying date fields on\ntemplates. Note that the corresponding locale-dictated format has higher\nprecedence and will be applied instead. See\ndate.\n\nSee also `DATE_FORMAT` and `SHORT_DATETIME_FORMAT`.",
+    "example": "",
+    "default": "'m/d/Y' (e.g. 12/31/2003)",
+    "category": "Core",
+    "name": "SHORT_DATE_FORMAT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#short-date-format"
+  },
+  {
+    "label": "SHORT_DATETIME_FORMAT",
+    "description": "An available formatting that can be used for displaying datetime fields on\ntemplates. Note that the corresponding locale-dictated format has higher\nprecedence and will be applied instead. See\ndate.\n\nSee also `DATE_FORMAT` and `SHORT_DATE_FORMAT`.",
+    "example": "",
+    "default": "'m/d/Y P' (e.g. 12/31/2003 4 p.m.)",
+    "category": "Core",
+    "name": "SHORT_DATETIME_FORMAT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#short-datetime-format"
+  },
+  {
+    "label": "SIGNING_BACKEND",
+    "description": "The backend used for signing cookies and other data.\n\nSee also the /topics/signing documentation.",
+    "example": "",
+    "default": "'django.core.signing.TimestampSigner'",
+    "category": "Core",
+    "name": "SIGNING_BACKEND",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#signing-backend"
+  },
+  {
+    "label": "SILENCED_SYSTEM_CHECKS",
+    "description": "A list of identifiers of messages generated by the system check framework\n(i.e. `[\"models.W001\"]`) that you wish to permanently acknowledge and ignore.\nSilenced checks will not be output to the console.\n\nSee also the /ref/checks documentation.",
+    "example": "",
+    "default": "[] (Empty list)",
+    "category": "Core",
+    "name": "SILENCED_SYSTEM_CHECKS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#silenced-system-checks"
+  },
+  {
+    "label": "STORAGES",
+    "description": "{\n        \"default\": {\n            \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n        },\n        \"staticfiles\": {\n            \"BACKEND\": \"django.contrib.staticfiles.storage.StaticFilesStorage\",\n        },\n    }\n\nA dictionary containing the settings for all storages to be used with Django.\nIt is a nested dictionary whose contents map a storage alias to a dictionary\ncontaining the options for an individual storage.\n\nStorages can have any alias you choose. However, there are two aliases with\nspecial significance:\n\n* `default` for /topics/files.\n  `'``django.core.files.storage.FileSystemStorage`\\ `'` is the\n  default storage engine.\n* `staticfiles` for /ref/contrib/staticfiles.\n  `'``django.contrib.staticfiles.storage.StaticFilesStorage`\\ `'` is\n  the default storage engine.\n\nThe following is an example `settings.py` snippet defining a custom file\nstorage called `example`::\n\n    STORAGES = {\n        # ...\n        \"example\": {\n            \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n            \"OPTIONS\": {\n                \"location\": \"/example\",\n                \"base_url\": \"/example/\",\n            },\n        },\n    }\n\n`OPTIONS` are passed to the `BACKEND` on initialization in `**kwargs`.\n\nA ready-to-use instance of the storage backends can be retrieved from\n:data:`django.core.files.storage.storages`. Use a key corresponding to the\nbackend definition in `STORAGES`.",
+    "example": "{\n    \"default\": {\n        \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n    },\n    \"staticfiles\": {\n        \"BACKEND\": \"django.contrib.staticfiles.storage.StaticFilesStorage\",\n    },\n}",
+    "default": ":",
+    "category": "Static Files",
+    "name": "STORAGES",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#storages"
+  },
+  {
+    "label": "TASKS",
+    "description": "{\n        \"default\": {\n            \"BACKEND\": \"django.tasks.backends.immediate.ImmediateBackend\",\n        }\n    }\n\nA dictionary containing the settings for all Task backends to be used with\nDjango. It is a nested dictionary whose contents maps backend aliases to a\ndictionary containing the options for each backend.\n\nThe `TASKS` setting must configure a `default` backend; any number\nof additional backends may also be specified. Depending on which backend is\nused, other options may be required.",
+    "example": "{\n    \"default\": {\n        \"BACKEND\": \"django.tasks.backends.immediate.ImmediateBackend\",\n    }\n}",
+    "default": ":",
+    "category": "Core",
+    "children": [
+      {
+        "label": "TASKS.{}.BACKEND",
+        "description": "The Tasks backend to use. The built-in backends are:\n\n* `'django.tasks.backends.dummy.DummyBackend'`\n* `'django.tasks.backends.immediate.ImmediateBackend'`\n\nYou can use a backend that doesn't ship with Django by setting\n`TASKS-BACKEND` to a fully-qualified path of a backend\nclass (i.e. `mypackage.backends.whatever.WhateverBackend`).",
+        "example": "",
+        "default": "'' (Empty string)",
+        "category": "Core",
+        "name": "BACKEND",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-backend"
+      },
+      {
+        "label": "TASKS.{}.QUEUES",
+        "description": "Specify the queue names supported by the backend. This can be used to ensure\nTasks aren't enqueued to queues which do not exist.\n\nTo disable queue name validation, set to an empty list (`[]`).",
+        "example": "",
+        "default": "[\"default\"]",
+        "category": "Core",
+        "name": "QUEUES",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-queues"
+      },
+      {
+        "label": "TASKS.{}.OPTIONS",
+        "description": "Extra parameters to pass to the Task backend. Available parameters vary\ndepending on the Task backend.",
+        "example": "",
+        "default": "{}",
+        "category": "Core",
+        "name": "OPTIONS",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-options"
+      }
+    ],
+    "name": "TASKS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks"
+  },
+  {
+    "label": "TEMPLATES",
+    "description": "A list containing the settings for all template engines to be used with\nDjango. Each item of the list is a dictionary containing the options for an\nindividual engine.",
+    "example": "TEMPLATES = [\n    {\n        \"BACKEND\": \"django.template.backends.django.DjangoTemplates\",\n        \"APP_DIRS\": True,\n    },\n]",
+    "default": "[] (Empty list)",
+    "category": "Templates",
+    "children": [
+      {
+        "label": "TEMPLATES.[].BACKEND",
+        "description": "The template backend to use. The built-in template backends are:\n\n* `'django.template.backends.django.DjangoTemplates'`\n* `'django.template.backends.jinja2.Jinja2'`\n\nYou can use a template backend that doesn't ship with Django by setting\n`BACKEND` to a fully-qualified path (i.e. `'mypackage.whatever.Backend'`).",
+        "example": "",
+        "default": "Not defined",
+        "category": "Templates",
+        "name": "BACKEND",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-backend"
+      },
+      {
+        "label": "TEMPLATES.[].NAME",
+        "description": "The alias for this particular template engine. It's an identifier that allows\nselecting an engine for rendering. Aliases must be unique across all\nconfigured template engines.\n\nIt defaults to the name of the module defining the engine class, i.e. the\nnext to last piece of `TEMPLATES-BACKEND`, when it isn't\nprovided. For example if the backend is `'mypackage.whatever.Backend'` then\nits default name is `'whatever'`.",
+        "example": "",
+        "default": "see below",
+        "category": "Templates",
+        "name": "NAME",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-name"
+      },
+      {
+        "label": "TEMPLATES.[].DIRS",
+        "description": "Directories where the engine should look for template source files, in search\norder.",
+        "example": "",
+        "default": "[] (Empty list)",
+        "category": "Templates",
+        "name": "DIRS",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-dirs"
+      },
+      {
+        "label": "TEMPLATES.[].APP_DIRS",
+        "description": "Whether the engine should look for template source files inside installed\napplications.",
+        "example": "The default :file:`settings.py` file created by :djadmin:`django-admin\nstartproject <startproject>` sets ``'APP_DIRS': True``.",
+        "default": "False",
+        "category": "Templates",
+        "name": "APP_DIRS",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-app-dirs"
+      },
+      {
+        "label": "TEMPLATES.[].OPTIONS",
+        "description": "Extra parameters to pass to the template backend. Available parameters vary\ndepending on the template backend. See\n`django.template.backends.django.DjangoTemplates` and\n`django.template.backends.jinja2.Jinja2` for the options of the\nbuilt-in backends.",
+        "example": "",
+        "default": "{} (Empty dict)",
+        "category": "Templates",
+        "name": "OPTIONS",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-options"
+      }
+    ],
+    "name": "TEMPLATES",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates"
+  },
+  {
+    "label": "TEST_RUNNER",
+    "description": "The name of the class to use for starting the test suite. See\nother-testing-frameworks.",
+    "example": "",
+    "default": "'django.test.runner.DiscoverRunner'",
+    "category": "Core",
+    "name": "TEST_RUNNER",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#test-runner"
+  },
+  {
+    "label": "TEST_NON_SERIALIZED_APPS",
+    "description": "In order to restore the database state between tests for\n`TransactionTestCase`\\s and database backends without transactions, Django\nwill test-case-serialized-rollback\nwhen it starts the test run so it can then reload from that copy before running\ntests that need it.\n\nThis slows down the startup time of the test runner; if you have apps that\nyou know don't need this feature, you can add their full names in here (e.g.\n`'django.contrib.contenttypes'`) to exclude them from this serialization\nprocess.",
+    "example": "",
+    "default": "[] (Empty list)",
+    "category": "Core",
+    "name": "TEST_NON_SERIALIZED_APPS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#test-non-serialized-apps"
+  },
+  {
+    "label": "THOUSAND_SEPARATOR",
+    "description": "Default thousand separator used when formatting numbers. This setting is\nused only when `USE_THOUSAND_SEPARATOR` is `True` and\n`NUMBER_GROUPING` is greater than `0`.\n\nNote that the locale-dictated format has higher precedence and will be applied\ninstead.\n\nSee also `NUMBER_GROUPING`, `DECIMAL_SEPARATOR` and\n`USE_THOUSAND_SEPARATOR`.",
+    "example": "",
+    "default": "',' (Comma)",
+    "category": "Core",
+    "name": "THOUSAND_SEPARATOR",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#thousand-separator"
+  },
+  {
+    "label": "TIME_FORMAT",
+    "description": "The default formatting to use for displaying time fields in any part of the\nsystem. Note that the locale-dictated format has higher precedence and will be\napplied instead. See date.\n\nSee also `DATE_FORMAT` and `DATETIME_FORMAT`.",
+    "example": "",
+    "default": "'P' (e.g. 4 p.m.)",
+    "category": "i18n",
+    "name": "TIME_FORMAT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-format"
+  },
+  {
+    "label": "TIME_INPUT_FORMATS",
+    "description": "[\n        \"%H:%M:%S\",  # '14:30:59'\n        \"%H:%M:%S.%f\",  # '14:30:59.000200'\n        \"%H:%M\",  # '14:30'\n    ]\n\nA list of formats that will be accepted when inputting data on a time field.\nFormats will be tried in order, using the first valid one. Note that these\nformat strings use Python's strftime-strptime-behavior, not the format strings from the date\ntemplate filter.\n\nThe locale-dictated format has higher precedence and will be applied instead.\n\nSee also `DATE_INPUT_FORMATS` and `DATETIME_INPUT_FORMATS`.",
+    "example": "[\n    \"%H:%M:%S\",  # '14:30:59'\n    \"%H:%M:%S.%f\",  # '14:30:59.000200'\n    \"%H:%M\",  # '14:30'\n]",
+    "default": ":",
+    "category": "i18n",
+    "name": "TIME_INPUT_FORMATS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-input-formats"
+  },
+  {
+    "label": "TIME_ZONE",
+    "description": "A string representing the time zone for this installation. See the list of\ntime zones.",
+    "example": "Since Django was first released with the :setting:`TIME_ZONE` set to\n``'America/Chicago'``, the global setting (used if nothing is defined in\nyour project's ``settings.py``) remains ``'America/Chicago'`` for backwards\ncompatibility. New project templates default to ``'UTC'``.",
+    "default": "'America/Chicago'",
+    "category": "i18n",
+    "name": "TIME_ZONE",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-zone"
+  },
+  {
+    "label": "USE_I18N",
+    "description": "A boolean that specifies whether Django's translation system should be enabled.\nThis provides a way to turn it off, for performance. If this is set to\n`False`, Django will make some optimizations so as not to load the\ntranslation machinery.\n\nSee also `LANGUAGE_CODE` and `USE_TZ`.",
+    "example": "The default :file:`settings.py` file created by :djadmin:`django-admin\nstartproject <startproject>` includes ``USE_I18N = True`` for convenience.",
+    "default": "True",
+    "category": "i18n",
+    "name": "USE_I18N",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-i18n"
+  },
+  {
+    "label": "USE_THOUSAND_SEPARATOR",
+    "description": "A boolean that specifies whether to display numbers using a thousand separator.\nWhen set to `True`, Django will format numbers using the\n`NUMBER_GROUPING` and `THOUSAND_SEPARATOR` settings. The\nlatter two settings may also be dictated by the locale, which takes precedence.\n\nSee also `DECIMAL_SEPARATOR`, `NUMBER_GROUPING` and\n`THOUSAND_SEPARATOR`.",
+    "example": "",
+    "default": "False",
+    "category": "Core",
+    "name": "USE_THOUSAND_SEPARATOR",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-thousand-separator"
+  },
+  {
+    "label": "USE_TZ",
+    "description": "A boolean that specifies if datetimes will be timezone-aware by default or not.\nIf this is set to `True`, Django will use timezone-aware datetimes\ninternally.\n\nWhen `USE_TZ` is False, Django will use naive datetimes in local time, except\nwhen parsing ISO 8601 formatted strings, where timezone information will always\nbe retained if present.\n\nSee also `TIME_ZONE` and `USE_I18N`.",
+    "example": "",
+    "default": "True",
+    "category": "i18n",
+    "name": "USE_TZ",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-tz"
+  },
+  {
+    "label": "USE_X_FORWARDED_HOST",
+    "description": "A boolean that specifies whether to use the `X-Forwarded-Host` header in\npreference to the `Host` header. This should only be enabled if a proxy\nwhich sets this header is in use.\n\nThis setting takes priority over `USE_X_FORWARDED_PORT`. Per\n:rfc:`7239#section-5.3`, the `X-Forwarded-Host` header can include the port\nnumber, in which case you shouldn't use `USE_X_FORWARDED_PORT`.",
+    "example": "",
+    "default": "False",
+    "category": "Core",
+    "name": "USE_X_FORWARDED_HOST",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-x-forwarded-host"
+  },
+  {
+    "label": "USE_X_FORWARDED_PORT",
+    "description": "A boolean that specifies whether to use the `X-Forwarded-Port` header in\npreference to the `SERVER_PORT` `META` variable. This should only be\nenabled if a proxy which sets this header is in use.\n\n`USE_X_FORWARDED_HOST` takes priority over this setting.",
+    "example": "",
+    "default": "False",
+    "category": "Core",
+    "name": "USE_X_FORWARDED_PORT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-x-forwarded-port"
+  },
+  {
+    "label": "URLIZE_ASSUME_HTTPS",
+    "description": "Set this transitional setting to `True` to opt into using HTTPS as the\ndefault protocol when none is provided in URLs processed by the\nurlize and urlizetrunc template filters during the Django\n6.x release cycle.",
+    "example": "",
+    "default": "False",
+    "category": "Core",
+    "name": "URLIZE_ASSUME_HTTPS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#urlize-assume-https"
+  },
+  {
+    "label": "WSGI_APPLICATION",
+    "description": "The full Python path of the WSGI application object that Django's built-in\nservers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin\nstartproject <startproject>` management command will create a standard\n`wsgi.py` file with an `application` callable in it, and point this setting\nto that `application`.\n\nIf not set, the return value of `django.core.wsgi.get_wsgi_application()`\nwill be used. In this case, the behavior of :djadmin:`runserver` will be\nidentical to previous Django versions.",
+    "example": "",
+    "default": "None",
+    "category": "Apps",
+    "name": "WSGI_APPLICATION",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#wsgi-application"
+  },
+  {
+    "label": "YEAR_MONTH_FORMAT",
+    "description": "The default formatting to use for date fields on Django admin change-list\npages -- and, possibly, by other parts of the system -- in cases when only the\nyear and month are displayed.\n\nFor example, when a Django admin change-list page is being filtered by a date\ndrilldown, the header for a given month displays the month and the year.\nDifferent locales have different formats. For example, U.S. English would say\n\"January 2006,\" whereas another locale might say \"2006/January.\"\n\nNote that the corresponding locale-dictated format has higher precedence and\nwill be applied instead.\n\nSee date. See also\n`DATE_FORMAT`, `DATETIME_FORMAT`, `TIME_FORMAT`\nand `MONTH_DAY_FORMAT`.",
+    "example": "",
+    "default": "'F Y'",
+    "category": "Core",
+    "name": "YEAR_MONTH_FORMAT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#year-month-format"
+  },
+  {
+    "label": "X_FRAME_OPTIONS",
+    "description": "The default value for the X-Frame-Options header used by\n`django.middleware.clickjacking.XFrameOptionsMiddleware`. See the\n/ref/clickjacking/ documentation.\n\nAuth\n====\n\nSettings for `django.contrib.auth`.",
+    "example": "",
+    "default": "'DENY'",
+    "category": "Security",
+    "name": "X_FRAME_OPTIONS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#x-frame-options"
+  },
+  {
+    "label": "AUTHENTICATION_BACKENDS",
+    "description": "A list of authentication backend classes (as strings) to use when attempting to\nauthenticate a user. See the authentication-backends for details.",
+    "example": "",
+    "default": "['django.contrib.auth.backends.ModelBackend']",
+    "category": "Core",
+    "name": "AUTHENTICATION_BACKENDS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#authentication-backends"
+  },
+  {
+    "label": "AUTH_USER_MODEL",
+    "description": "The model to use to represent a User. See auth-custom-user.",
+    "example": "You cannot change the AUTH_USER_MODEL setting during the lifetime of\na project (i.e. once you have made and migrated models that depend on it)\nwithout serious effort. It is intended to be set at the project start,\nand the model it refers to must be available in the first migration of\nthe app that it lives in.\nSee :ref:`auth-custom-user` for more details.",
+    "default": "'auth.User'",
+    "category": "Auth",
+    "name": "AUTH_USER_MODEL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#auth-user-model"
+  },
+  {
+    "label": "LOGIN_REDIRECT_URL",
+    "description": "The URL or naming-url-patterns where requests are\nredirected after login when the `django.contrib.auth.views.LoginView`\ndoesn't get a `next` GET parameter.",
+    "example": "",
+    "default": "'/accounts/profile/'",
+    "category": "Auth",
+    "name": "LOGIN_REDIRECT_URL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#login-redirect-url"
+  },
+  {
+    "label": "LOGIN_URL",
+    "description": "The URL or naming-url-patterns where requests are\nredirected for login when using the\n`~django.contrib.auth.decorators.login_required()` decorator,\n`django.contrib.auth.mixins.LoginRequiredMixin`,\n`django.contrib.auth.mixins.AccessMixin`, or when\n`django.contrib.auth.middleware.LoginRequiredMiddleware` is installed.",
+    "example": "",
+    "default": "'/accounts/login/'",
+    "category": "Auth",
+    "name": "LOGIN_URL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#login-url"
+  },
+  {
+    "label": "LOGOUT_REDIRECT_URL",
+    "description": "The URL or naming-url-patterns where requests are\nredirected after logout if `django.contrib.auth.views.LogoutView`\ndoesn't have a `next_page` attribute.\n\nIf `None`, no redirect will be performed and the logout view will be\nrendered.",
+    "example": "",
+    "default": "None",
+    "category": "Auth",
+    "name": "LOGOUT_REDIRECT_URL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#logout-redirect-url"
+  },
+  {
+    "label": "PASSWORD_RESET_TIMEOUT",
+    "description": "The number of seconds a password reset link is valid for.\n\nUsed by the `django.contrib.auth.views.PasswordResetConfirmView`.",
+    "example": "Reducing the value of this timeout doesn't make any difference to the\nability of an attacker to brute-force a password reset token. Tokens are\ndesigned to be safe from brute-forcing without any timeout.\n\nThis timeout exists to protect against some unlikely attack scenarios, such\nas someone gaining access to email archives that may contain old, unused\npassword reset tokens.",
+    "default": "259200 (3 days, in seconds)",
+    "category": "Auth",
+    "name": "PASSWORD_RESET_TIMEOUT",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#password-reset-timeout"
+  },
+  {
+    "label": "PASSWORD_HASHERS",
+    "description": "[\n        \"django.contrib.auth.hashers.PBKDF2PasswordHasher\",\n        \"django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher\",\n        \"django.contrib.auth.hashers.Argon2PasswordHasher\",\n        \"django.contrib.auth.hashers.BCryptSHA256PasswordHasher\",\n        \"django.contrib.auth.hashers.ScryptPasswordHasher\",\n    ]",
+    "example": "[\n    \"django.contrib.auth.hashers.PBKDF2PasswordHasher\",\n    \"django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher\",\n    \"django.contrib.auth.hashers.Argon2PasswordHasher\",\n    \"django.contrib.auth.hashers.BCryptSHA256PasswordHasher\",\n    \"django.contrib.auth.hashers.ScryptPasswordHasher\",\n]",
+    "default": ":",
+    "category": "Auth",
+    "name": "PASSWORD_HASHERS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#password-hashers"
+  },
+  {
+    "label": "AUTH_PASSWORD_VALIDATORS",
+    "description": "The list of validators that are used to check the strength of user's passwords.\nSee password-validation for more details. By default, no validation is\nperformed and all passwords are accepted.",
+    "example": "",
+    "default": "[] (Empty list)",
+    "category": "Auth",
+    "name": "AUTH_PASSWORD_VALIDATORS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators"
+  },
+  {
+    "label": "MESSAGE_LEVEL",
+    "description": "Sets the minimum message level that will be recorded by the messages\nframework. See message-level for more details.",
+    "example": "from django.contrib.messages import constants as message_constants\n\nMESSAGE_LEVEL = message_constants.DEBUG",
+    "default": "messages.INFO",
+    "category": "Core",
+    "name": "MESSAGE_LEVEL",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-level"
+  },
+  {
+    "label": "MESSAGE_STORAGE",
+    "description": "Controls where Django stores message data. Valid values are:\n\n* `'django.contrib.messages.storage.fallback.FallbackStorage'`\n* `'django.contrib.messages.storage.session.SessionStorage'`\n* `'django.contrib.messages.storage.cookie.CookieStorage'`\n\nSee message-storage-backends for more\ndetails.\n\nThe backends that use cookies --\n`django.contrib.messages.storage.cookie.CookieStorage` and\n`django.contrib.messages.storage.fallback.FallbackStorage` --\nuse the value of `SESSION_COOKIE_DOMAIN`,\n`SESSION_COOKIE_SECURE` and `SESSION_COOKIE_HTTPONLY` when\nsetting their cookies.",
+    "example": "",
+    "default": "'django.contrib.messages.storage.fallback.FallbackStorage'",
+    "category": "Core",
+    "name": "MESSAGE_STORAGE",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-storage"
+  },
+  {
+    "label": "MESSAGE_TAGS",
+    "description": "{\n        messages.DEBUG: \"debug\",\n        messages.INFO: \"info\",\n        messages.SUCCESS: \"success\",\n        messages.WARNING: \"warning\",\n        messages.ERROR: \"error\",\n    }\n\nThis sets the mapping of message level to message tag, which is typically\nrendered as a CSS class in HTML. If you specify a value, it will extend\nthe default. This means you only have to specify those values which you need\nto override. See message-displaying above for more details.",
+    "example": "{\n    messages.DEBUG: \"debug\",\n    messages.INFO: \"info\",\n    messages.SUCCESS: \"success\",\n    messages.WARNING: \"warning\",\n    messages.ERROR: \"error\",\n}",
+    "default": ":",
+    "category": "Core",
+    "name": "MESSAGE_TAGS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#message-tags"
+  },
+  {
     "label": "SESSION_CACHE_ALIAS",
     "description": "If you're using cached-sessions-backend,\nthis selects the cache to use.",
     "example": "",
@@ -1545,42 +1810,6 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#session-serializer"
   },
   {
-    "label": "SHORT_DATETIME_FORMAT",
-    "description": "An available formatting that can be used for displaying datetime fields on\ntemplates. Note that the corresponding locale-dictated format has higher\nprecedence and will be applied instead. See\ndate.\n\nSee also `DATE_FORMAT` and `SHORT_DATE_FORMAT`.",
-    "example": "",
-    "default": "'m/d/Y P' (e.g. 12/31/2003 4 p.m.)",
-    "category": "Core",
-    "name": "SHORT_DATETIME_FORMAT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#short-datetime-format"
-  },
-  {
-    "label": "SHORT_DATE_FORMAT",
-    "description": "An available formatting that can be used for displaying date fields on\ntemplates. Note that the corresponding locale-dictated format has higher\nprecedence and will be applied instead. See\ndate.\n\nSee also `DATE_FORMAT` and `SHORT_DATETIME_FORMAT`.",
-    "example": "",
-    "default": "'m/d/Y' (e.g. 12/31/2003)",
-    "category": "Core",
-    "name": "SHORT_DATE_FORMAT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#short-date-format"
-  },
-  {
-    "label": "SIGNING_BACKEND",
-    "description": "The backend used for signing cookies and other data.\n\nSee also the /topics/signing documentation.",
-    "example": "",
-    "default": "'django.core.signing.TimestampSigner'",
-    "category": "Core",
-    "name": "SIGNING_BACKEND",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#signing-backend"
-  },
-  {
-    "label": "SILENCED_SYSTEM_CHECKS",
-    "description": "A list of identifiers of messages generated by the system check framework\n(i.e. `[\"models.W001\"]`) that you wish to permanently acknowledge and ignore.\nSilenced checks will not be output to the console.\n\nSee also the /ref/checks documentation.",
-    "example": "",
-    "default": "[] (Empty list)",
-    "category": "Core",
-    "name": "SILENCED_SYSTEM_CHECKS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#silenced-system-checks"
-  },
-  {
     "label": "SITE_ID",
     "description": "The ID, as an integer, of the current site in the `django_site` database\ntable. This is used so that application data can hook into specific sites\nand a single database can manage content for multiple sites.",
     "example": "",
@@ -1588,24 +1817,6 @@
     "category": "Core",
     "name": "SITE_ID",
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#site-id"
-  },
-  {
-    "label": "STATICFILES_DIRS",
-    "description": "This setting defines the additional locations the staticfiles app will traverse\nif the `FileSystemFinder` finder is enabled, e.g. if you use the\n:djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the\nstatic file serving view.\n\nThis should be set to a list of strings that contain full paths to\nyour additional files directory(ies) e.g.::\n\n    STATICFILES_DIRS = [\n        \"/home/special.polls.com/polls/static\",\n        \"/home/polls.com/polls/static\",\n        \"/opt/webfiles/common\",\n    ]\n\nNote that these paths should use Unix-style forward slashes, even on Windows\n(e.g. `\"C:/Users/user/mysite/extra_static_content\"`).",
-    "example": "STATICFILES_DIRS = [\n    \"/home/special.polls.com/polls/static\",\n    \"/home/polls.com/polls/static\",\n    \"/opt/webfiles/common\",\n]",
-    "default": "[] (Empty list)",
-    "category": "Static Files",
-    "name": "STATICFILES_DIRS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#staticfiles-dirs"
-  },
-  {
-    "label": "STATICFILES_FINDERS",
-    "description": "[\n        \"django.contrib.staticfiles.finders.FileSystemFinder\",\n        \"django.contrib.staticfiles.finders.AppDirectoriesFinder\",\n    ]\n\nThe list of finder backends that know how to find static files in\nvarious locations.\n\nThe default will find files stored in the `STATICFILES_DIRS` setting\n(using `django.contrib.staticfiles.finders.FileSystemFinder`) and in a\n`static` subdirectory of each app (using\n`django.contrib.staticfiles.finders.AppDirectoriesFinder`). If multiple\nfiles with the same name are present, the first file that is found will be\nused.\n\nOne finder is disabled by default:\n`django.contrib.staticfiles.finders.DefaultStorageFinder`. If added to\nyour `STATICFILES_FINDERS` setting, it will look for static files in\nthe default file storage as defined by the `default` key in the\n`STORAGES` setting.",
-    "example": "[\n    \"django.contrib.staticfiles.finders.FileSystemFinder\",\n    \"django.contrib.staticfiles.finders.AppDirectoriesFinder\",\n]",
-    "default": ":",
-    "category": "Static Files",
-    "name": "STATICFILES_FINDERS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#staticfiles-finders"
   },
   {
     "label": "STATIC_ROOT",
@@ -1626,241 +1837,21 @@
     "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#static-url"
   },
   {
-    "label": "STORAGES",
-    "description": "{\n        \"default\": {\n            \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n        },\n        \"staticfiles\": {\n            \"BACKEND\": \"django.contrib.staticfiles.storage.StaticFilesStorage\",\n        },\n    }\n\nA dictionary containing the settings for all storages to be used with Django.\nIt is a nested dictionary whose contents map a storage alias to a dictionary\ncontaining the options for an individual storage.\n\nStorages can have any alias you choose. However, there are two aliases with\nspecial significance:\n\n* `default` for /topics/files.\n  `'``django.core.files.storage.FileSystemStorage`\\ `'` is the\n  default storage engine.\n* `staticfiles` for /ref/contrib/staticfiles.\n  `'``django.contrib.staticfiles.storage.StaticFilesStorage`\\ `'` is\n  the default storage engine.\n\nThe following is an example `settings.py` snippet defining a custom file\nstorage called `example`::\n\n    STORAGES = {\n        # ...\n        \"example\": {\n            \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n            \"OPTIONS\": {\n                \"location\": \"/example\",\n                \"base_url\": \"/example/\",\n            },\n        },\n    }\n\n`OPTIONS` are passed to the `BACKEND` on initialization in `**kwargs`.\n\nA ready-to-use instance of the storage backends can be retrieved from\n:data:`django.core.files.storage.storages`. Use a key corresponding to the\nbackend definition in `STORAGES`.",
-    "example": "{\n    \"default\": {\n        \"BACKEND\": \"django.core.files.storage.FileSystemStorage\",\n    },\n    \"staticfiles\": {\n        \"BACKEND\": \"django.contrib.staticfiles.storage.StaticFilesStorage\",\n    },\n}",
+    "label": "STATICFILES_DIRS",
+    "description": "This setting defines the additional locations the staticfiles app will traverse\nif the `FileSystemFinder` finder is enabled, e.g. if you use the\n:djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the\nstatic file serving view.\n\nThis should be set to a list of strings that contain full paths to\nyour additional files directory(ies) e.g.::\n\n    STATICFILES_DIRS = [\n        \"/home/special.polls.com/polls/static\",\n        \"/home/polls.com/polls/static\",\n        \"/opt/webfiles/common\",\n    ]\n\nNote that these paths should use Unix-style forward slashes, even on Windows\n(e.g. `\"C:/Users/user/mysite/extra_static_content\"`).",
+    "example": "STATICFILES_DIRS = [\n    \"/home/special.polls.com/polls/static\",\n    \"/home/polls.com/polls/static\",\n    \"/opt/webfiles/common\",\n]",
+    "default": "[] (Empty list)",
+    "category": "Static Files",
+    "name": "STATICFILES_DIRS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#staticfiles-dirs"
+  },
+  {
+    "label": "STATICFILES_FINDERS",
+    "description": "[\n        \"django.contrib.staticfiles.finders.FileSystemFinder\",\n        \"django.contrib.staticfiles.finders.AppDirectoriesFinder\",\n    ]\n\nThe list of finder backends that know how to find static files in\nvarious locations.\n\nThe default will find files stored in the `STATICFILES_DIRS` setting\n(using `django.contrib.staticfiles.finders.FileSystemFinder`) and in a\n`static` subdirectory of each app (using\n`django.contrib.staticfiles.finders.AppDirectoriesFinder`). If multiple\nfiles with the same name are present, the first file that is found will be\nused.\n\nOne finder is disabled by default:\n`django.contrib.staticfiles.finders.DefaultStorageFinder`. If added to\nyour `STATICFILES_FINDERS` setting, it will look for static files in\nthe default file storage as defined by the `default` key in the\n`STORAGES` setting.",
+    "example": "[\n    \"django.contrib.staticfiles.finders.FileSystemFinder\",\n    \"django.contrib.staticfiles.finders.AppDirectoriesFinder\",\n]",
     "default": ":",
     "category": "Static Files",
-    "name": "STORAGES",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#storages"
-  },
-  {
-    "label": "TASKS",
-    "description": "{\n        \"default\": {\n            \"BACKEND\": \"django.tasks.backends.immediate.ImmediateBackend\",\n        }\n    }\n\nA dictionary containing the settings for all Task backends to be used with\nDjango. It is a nested dictionary whose contents maps backend aliases to a\ndictionary containing the options for each backend.\n\nThe `TASKS` setting must configure a `default` backend; any number\nof additional backends may also be specified. Depending on which backend is\nused, other options may be required.",
-    "example": "{\n    \"default\": {\n        \"BACKEND\": \"django.tasks.backends.immediate.ImmediateBackend\",\n    }\n}",
-    "default": ":",
-    "category": "Core",
-    "children": [
-      {
-        "label": "TASKS.{}.BACKEND",
-        "description": "The Tasks backend to use. The built-in backends are:\n\n* `'django.tasks.backends.dummy.DummyBackend'`\n* `'django.tasks.backends.immediate.ImmediateBackend'`\n\nYou can use a backend that doesn't ship with Django by setting\n`TASKS-BACKEND` to a fully-qualified path of a backend\nclass (i.e. `mypackage.backends.whatever.WhateverBackend`).",
-        "example": "",
-        "default": "'' (Empty string)",
-        "category": "Core",
-        "name": "BACKEND",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-backend"
-      },
-      {
-        "label": "TASKS.{}.QUEUES",
-        "description": "Specify the queue names supported by the backend. This can be used to ensure\nTasks aren't enqueued to queues which do not exist.\n\nTo disable queue name validation, set to an empty list (`[]`).",
-        "example": "",
-        "default": "[\"default\"]",
-        "category": "Core",
-        "name": "QUEUES",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-queues"
-      },
-      {
-        "label": "TASKS.{}.OPTIONS",
-        "description": "Extra parameters to pass to the Task backend. Available parameters vary\ndepending on the Task backend.",
-        "example": "",
-        "default": "{}",
-        "category": "Core",
-        "name": "OPTIONS",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks-options"
-      }
-    ],
-    "name": "TASKS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#tasks"
-  },
-  {
-    "label": "TEMPLATES",
-    "description": "A list containing the settings for all template engines to be used with\nDjango. Each item of the list is a dictionary containing the options for an\nindividual engine.",
-    "example": "TEMPLATES = [\n    {\n        \"BACKEND\": \"django.template.backends.django.DjangoTemplates\",\n        \"APP_DIRS\": True,\n    },\n]",
-    "default": "[] (Empty list)",
-    "category": "Templates",
-    "children": [
-      {
-        "label": "TEMPLATES.[].BACKEND",
-        "description": "The template backend to use. The built-in template backends are:\n\n* `'django.template.backends.django.DjangoTemplates'`\n* `'django.template.backends.jinja2.Jinja2'`\n\nYou can use a template backend that doesn't ship with Django by setting\n`BACKEND` to a fully-qualified path (i.e. `'mypackage.whatever.Backend'`).",
-        "example": "",
-        "default": "Not defined",
-        "category": "Templates",
-        "name": "BACKEND",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-backend"
-      },
-      {
-        "label": "TEMPLATES.[].NAME",
-        "description": "The alias for this particular template engine. It's an identifier that allows\nselecting an engine for rendering. Aliases must be unique across all\nconfigured template engines.\n\nIt defaults to the name of the module defining the engine class, i.e. the\nnext to last piece of `TEMPLATES-BACKEND`, when it isn't\nprovided. For example if the backend is `'mypackage.whatever.Backend'` then\nits default name is `'whatever'`.",
-        "example": "",
-        "default": "see below",
-        "category": "Templates",
-        "name": "NAME",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-name"
-      },
-      {
-        "label": "TEMPLATES.[].DIRS",
-        "description": "Directories where the engine should look for template source files, in search\norder.",
-        "example": "",
-        "default": "[] (Empty list)",
-        "category": "Templates",
-        "name": "DIRS",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-dirs"
-      },
-      {
-        "label": "TEMPLATES.[].APP_DIRS",
-        "description": "Whether the engine should look for template source files inside installed\napplications.",
-        "example": "The default :file:`settings.py` file created by :djadmin:`django-admin\nstartproject <startproject>` sets ``'APP_DIRS': True``.",
-        "default": "False",
-        "category": "Templates",
-        "name": "APP_DIRS",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-app-dirs"
-      },
-      {
-        "label": "TEMPLATES.[].OPTIONS",
-        "description": "Extra parameters to pass to the template backend. Available parameters vary\ndepending on the template backend. See\n`django.template.backends.django.DjangoTemplates` and\n`django.template.backends.jinja2.Jinja2` for the options of the\nbuilt-in backends.",
-        "example": "",
-        "default": "{} (Empty dict)",
-        "category": "Templates",
-        "name": "OPTIONS",
-        "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates-options"
-      }
-    ],
-    "name": "TEMPLATES",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#templates"
-  },
-  {
-    "label": "TEST_NON_SERIALIZED_APPS",
-    "description": "In order to restore the database state between tests for\n`TransactionTestCase`\\s and database backends without transactions, Django\nwill test-case-serialized-rollback\nwhen it starts the test run so it can then reload from that copy before running\ntests that need it.\n\nThis slows down the startup time of the test runner; if you have apps that\nyou know don't need this feature, you can add their full names in here (e.g.\n`'django.contrib.contenttypes'`) to exclude them from this serialization\nprocess.",
-    "example": "",
-    "default": "[] (Empty list)",
-    "category": "Core",
-    "name": "TEST_NON_SERIALIZED_APPS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#test-non-serialized-apps"
-  },
-  {
-    "label": "TEST_RUNNER",
-    "description": "The name of the class to use for starting the test suite. See\nother-testing-frameworks.",
-    "example": "",
-    "default": "'django.test.runner.DiscoverRunner'",
-    "category": "Core",
-    "name": "TEST_RUNNER",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#test-runner"
-  },
-  {
-    "label": "THOUSAND_SEPARATOR",
-    "description": "Default thousand separator used when formatting numbers. This setting is\nused only when `USE_THOUSAND_SEPARATOR` is `True` and\n`NUMBER_GROUPING` is greater than `0`.\n\nNote that the locale-dictated format has higher precedence and will be applied\ninstead.\n\nSee also `NUMBER_GROUPING`, `DECIMAL_SEPARATOR` and\n`USE_THOUSAND_SEPARATOR`.",
-    "example": "",
-    "default": "',' (Comma)",
-    "category": "Core",
-    "name": "THOUSAND_SEPARATOR",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#thousand-separator"
-  },
-  {
-    "label": "TIME_FORMAT",
-    "description": "The default formatting to use for displaying time fields in any part of the\nsystem. Note that the locale-dictated format has higher precedence and will be\napplied instead. See date.\n\nSee also `DATE_FORMAT` and `DATETIME_FORMAT`.",
-    "example": "",
-    "default": "'P' (e.g. 4 p.m.)",
-    "category": "i18n",
-    "name": "TIME_FORMAT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-format"
-  },
-  {
-    "label": "TIME_INPUT_FORMATS",
-    "description": "[\n        \"%H:%M:%S\",  # '14:30:59'\n        \"%H:%M:%S.%f\",  # '14:30:59.000200'\n        \"%H:%M\",  # '14:30'\n    ]\n\nA list of formats that will be accepted when inputting data on a time field.\nFormats will be tried in order, using the first valid one. Note that these\nformat strings use Python's strftime-strptime-behavior, not the format strings from the date\ntemplate filter.\n\nThe locale-dictated format has higher precedence and will be applied instead.\n\nSee also `DATE_INPUT_FORMATS` and `DATETIME_INPUT_FORMATS`.",
-    "example": "[\n    \"%H:%M:%S\",  # '14:30:59'\n    \"%H:%M:%S.%f\",  # '14:30:59.000200'\n    \"%H:%M\",  # '14:30'\n]",
-    "default": ":",
-    "category": "i18n",
-    "name": "TIME_INPUT_FORMATS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-input-formats"
-  },
-  {
-    "label": "TIME_ZONE",
-    "description": "A string representing the time zone for this installation. See the list of\ntime zones.",
-    "example": "Since Django was first released with the :setting:`TIME_ZONE` set to\n``'America/Chicago'``, the global setting (used if nothing is defined in\nyour project's ``settings.py``) remains ``'America/Chicago'`` for backwards\ncompatibility. New project templates default to ``'UTC'``.",
-    "default": "'America/Chicago'",
-    "category": "i18n",
-    "name": "TIME_ZONE",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#time-zone"
-  },
-  {
-    "label": "URLIZE_ASSUME_HTTPS",
-    "description": "Set this transitional setting to `True` to opt into using HTTPS as the\ndefault protocol when none is provided in URLs processed by the\nurlize and urlizetrunc template filters during the Django\n6.x release cycle.",
-    "example": "",
-    "default": "False",
-    "category": "Core",
-    "name": "URLIZE_ASSUME_HTTPS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#urlize-assume-https"
-  },
-  {
-    "label": "USE_I18N",
-    "description": "A boolean that specifies whether Django's translation system should be enabled.\nThis provides a way to turn it off, for performance. If this is set to\n`False`, Django will make some optimizations so as not to load the\ntranslation machinery.\n\nSee also `LANGUAGE_CODE` and `USE_TZ`.",
-    "example": "The default :file:`settings.py` file created by :djadmin:`django-admin\nstartproject <startproject>` includes ``USE_I18N = True`` for convenience.",
-    "default": "True",
-    "category": "i18n",
-    "name": "USE_I18N",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-i18n"
-  },
-  {
-    "label": "USE_THOUSAND_SEPARATOR",
-    "description": "A boolean that specifies whether to display numbers using a thousand separator.\nWhen set to `True`, Django will format numbers using the\n`NUMBER_GROUPING` and `THOUSAND_SEPARATOR` settings. The\nlatter two settings may also be dictated by the locale, which takes precedence.\n\nSee also `DECIMAL_SEPARATOR`, `NUMBER_GROUPING` and\n`THOUSAND_SEPARATOR`.",
-    "example": "",
-    "default": "False",
-    "category": "Core",
-    "name": "USE_THOUSAND_SEPARATOR",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-thousand-separator"
-  },
-  {
-    "label": "USE_TZ",
-    "description": "A boolean that specifies if datetimes will be timezone-aware by default or not.\nIf this is set to `True`, Django will use timezone-aware datetimes\ninternally.\n\nWhen `USE_TZ` is False, Django will use naive datetimes in local time, except\nwhen parsing ISO 8601 formatted strings, where timezone information will always\nbe retained if present.\n\nSee also `TIME_ZONE` and `USE_I18N`.",
-    "example": "",
-    "default": "True",
-    "category": "i18n",
-    "name": "USE_TZ",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-tz"
-  },
-  {
-    "label": "USE_X_FORWARDED_HOST",
-    "description": "A boolean that specifies whether to use the `X-Forwarded-Host` header in\npreference to the `Host` header. This should only be enabled if a proxy\nwhich sets this header is in use.\n\nThis setting takes priority over `USE_X_FORWARDED_PORT`. Per\n:rfc:`7239#section-5.3`, the `X-Forwarded-Host` header can include the port\nnumber, in which case you shouldn't use `USE_X_FORWARDED_PORT`.",
-    "example": "",
-    "default": "False",
-    "category": "Core",
-    "name": "USE_X_FORWARDED_HOST",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-x-forwarded-host"
-  },
-  {
-    "label": "USE_X_FORWARDED_PORT",
-    "description": "A boolean that specifies whether to use the `X-Forwarded-Port` header in\npreference to the `SERVER_PORT` `META` variable. This should only be\nenabled if a proxy which sets this header is in use.\n\n`USE_X_FORWARDED_HOST` takes priority over this setting.",
-    "example": "",
-    "default": "False",
-    "category": "Core",
-    "name": "USE_X_FORWARDED_PORT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#use-x-forwarded-port"
-  },
-  {
-    "label": "WSGI_APPLICATION",
-    "description": "The full Python path of the WSGI application object that Django's built-in\nservers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin\nstartproject <startproject>` management command will create a standard\n`wsgi.py` file with an `application` callable in it, and point this setting\nto that `application`.\n\nIf not set, the return value of `django.core.wsgi.get_wsgi_application()`\nwill be used. In this case, the behavior of :djadmin:`runserver` will be\nidentical to previous Django versions.",
-    "example": "",
-    "default": "None",
-    "category": "Apps",
-    "name": "WSGI_APPLICATION",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#wsgi-application"
-  },
-  {
-    "label": "X_FRAME_OPTIONS",
-    "description": "The default value for the X-Frame-Options header used by\n`django.middleware.clickjacking.XFrameOptionsMiddleware`. See the\n/ref/clickjacking/ documentation.\n\nAuth\n====\n\nSettings for `django.contrib.auth`.",
-    "example": "",
-    "default": "'DENY'",
-    "category": "Security",
-    "name": "X_FRAME_OPTIONS",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#x-frame-options"
-  },
-  {
-    "label": "YEAR_MONTH_FORMAT",
-    "description": "The default formatting to use for date fields on Django admin change-list\npages -- and, possibly, by other parts of the system -- in cases when only the\nyear and month are displayed.\n\nFor example, when a Django admin change-list page is being filtered by a date\ndrilldown, the header for a given month displays the month and the year.\nDifferent locales have different formats. For example, U.S. English would say\n\"January 2006,\" whereas another locale might say \"2006/January.\"\n\nNote that the corresponding locale-dictated format has higher precedence and\nwill be applied instead.\n\nSee date. See also\n`DATE_FORMAT`, `DATETIME_FORMAT`, `TIME_FORMAT`\nand `MONTH_DAY_FORMAT`.",
-    "example": "",
-    "default": "'F Y'",
-    "category": "Core",
-    "name": "YEAR_MONTH_FORMAT",
-    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#year-month-format"
+    "name": "STATICFILES_FINDERS",
+    "docsUrl": "https://docs.djangoproject.com/en/stable/ref/settings/#staticfiles-finders"
   }
 ]

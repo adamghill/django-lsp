@@ -1,13 +1,13 @@
 [
   {
     "name": "exact",
-    "description": "Exact match. If the value provided for comparison is `None`, it will be\ninterpreted as an SQL `NULL` (see :lookup:`isnull` for more details).\n:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they\ninterpret `None` as JSON `null` instead.\n\nExamples::\n\n    Entry.objects.get(id__exact=14)\n    Entry.objects.get(id__exact=None)\n\nSQL equivalents:",
+    "description": "Exact match. If the value provided for comparison is `None`, it will be\ninterpreted as an SQL `NULL` (see `isnull` for more details).\n:lookup:`Key and index lookups <jsonfield.key>` are exceptions: they\ninterpret `None` as JSON `null` instead.\n\nExamples::\n\n    Entry.objects.get(id__exact=14)\n    Entry.objects.get(id__exact=None)\n\nSQL equivalents:",
     "example": "Entry.objects.get(id__exact=14)\nEntry.objects.get(id__exact=None)",
     "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#exact"
   },
   {
     "name": "iexact",
-    "description": "Case-insensitive exact match. If the value provided for comparison is `None`,\nit will be interpreted as an SQL `NULL` (see :lookup:`isnull` for more\ndetails).",
+    "description": "Case-insensitive exact match. If the value provided for comparison is `None`,\nit will be interpreted as an SQL `NULL` (see `isnull` for more\ndetails).",
     "example": "Blog.objects.get(name__iexact=\"beatles blog\")\nBlog.objects.get(name__iexact=None)",
     "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#iexact"
   },
@@ -115,7 +115,7 @@
   },
   {
     "name": "week",
-    "description": "For date and datetime fields, return the week number (1-52 or 53) according\nto `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start\non a Monday and the first week contains the year's first Thursday.",
+    "description": "For date and datetime fields, return the week number (1-52 or 53) according\nto ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>, i.e., weeks start\non a Monday and the first week contains the year's first Thursday.",
     "example": "Entry.objects.filter(pub_date__week=52)\nEntry.objects.filter(pub_date__week__gte=32, pub_date__week__lte=38)",
     "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#week"
   },
@@ -133,7 +133,7 @@
   },
   {
     "name": "quarter",
-    "description": "For date and datetime fields, a 'quarter of the year' match. Allows chaining\nadditional field lookups. Takes an integer value between 1 and 4 representing\nthe quarter of the year.\n\nExample to retrieve entries in the second quarter (April 1 to June 30)::\n\n    Entry.objects.filter(pub_date__quarter=2)\n\n(No equivalent SQL code fragment is included for this lookup because\nimplementation of the relevant query varies among different database engines.)\n\nWhen `USE_TZ` is `True`, datetime fields are converted to the\ncurrent time zone before filtering. This requires :ref:`time zone definitions\nin the database <database-time-zone-definitions>`.",
+    "description": "For date and datetime fields, a 'quarter of the year' match. Allows chaining\nadditional field lookups. Takes an integer value between 1 and 4 representing\nthe quarter of the year.\n\nExample to retrieve entries in the second quarter (April 1 to June 30)::\n\n    Entry.objects.filter(pub_date__quarter=2)\n\n(No equivalent SQL code fragment is included for this lookup because\nimplementation of the relevant query varies among different database engines.)\n\nWhen `USE_TZ` is `True`, datetime fields are converted to the\ncurrent time zone before filtering. This requires database-time-zone-definitions.",
     "example": "Entry.objects.filter(pub_date__quarter=2)",
     "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/querysets/#quarter"
   },
