@@ -21,14 +21,9 @@ from typing import Optional
 
 from django_lsp.generator.common import (
     clean_rst_markup,
-    download_file,
     extract_code_example,
     slugify,
     strip_trailing_pointers,
-)
-
-SETTINGS_URL = (
-    "https://raw.githubusercontent.com/django/django/main/docs/ref/settings.txt"
 )
 
 
@@ -252,55 +247,24 @@ def parse_settings_rst(content: str) -> list[DjangoSetting]:
     return settings
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Parse Django settings.txt (RST) to JSON"
-    )
-    parser.add_argument(
-        "input",
-        nargs="?",
-        default="settings.txt",
-        help="Path to settings.txt RST file (default: settings.txt)",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        help="Output JSON file",
-        default="src/django_lsp/data/settings.json",
-    )
-    parser.add_argument(
-        "--pretty", action="store_true", help="Pretty print JSON output", default=True
-    )
-    parser.add_argument(
-        "--download",
-        "-d",
-        action="store_true",
-        help="Download settings.txt from Django GitHub repo",
-    )
+def run(
+    input_path: Path,
+    output_path: Optional[Path] = None,
+    pretty: bool = True,
+    metadata: Optional[dict] = None,
+):
+    """Run the settings parser with given input and output paths."""
+    if not input_path.exists():
+        print(f"Error: {input_path} not found.", file=sys.stderr)
+        return
 
-    args = parser.parse_args()
+    with open(input_path, "r", encoding="utf-8") as f:
+        content = f.read()
 
-    # Download or read input file
-    if args.download:
-        content = download_file(SETTINGS_URL, Path(args.input))
-    else:
-        if not Path(args.input).exists():
-            print(
-                f"Error: {args.input} not found. Use --download to fetch it.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        with open(args.input, "r", encoding="utf-8") as f:
-            content = f.read()
-
-    # Parse settings
     settings = parse_settings_rst(content)
-
-    # Create a dictionary for easy lookup
     settings_map = {s.rst_name: s for s in settings}
     top_level_settings = []
 
-    # Nest settings
     for s in settings:
         if s.nested_in and s.nested_in in settings_map:
             parent = settings_map[s.nested_in]
@@ -311,11 +275,8 @@ def main():
             top_level_settings.append(s)
 
     def get_container_type(setting: DjangoSetting) -> str:
-        """Determine if a setting is a list of dicts, dict of dicts, or simple dict."""
         desc = setting.description.lower()
         example = setting.example
-
-        # Heuristics for common Django patterns
         if "list" in desc or "[" in example:
             return "list"
         if (
@@ -329,69 +290,82 @@ def main():
         return "other"
 
     def update_tree_labels(setting: DjangoSetting, current_label: str):
-        """Recursively update labels to show container types."""
         setting.label = current_label
-
         if not setting.children:
             return
-
         container_type = get_container_type(setting)
         sep = "."
         if container_type == "list":
             sep = ".[]."
         elif container_type == "dict_with_alias":
             sep = ".{}."
-
         for child in setting.children:
             update_tree_labels(child, f"{current_label}{sep}{child.name}")
 
-    # Update labels starting from top-level
     for s in top_level_settings:
         update_tree_labels(s, s.label)
 
-    # Convert to JSON-serializable format
     def to_dict(s: DjangoSetting) -> dict:
         d = asdict(s)
-        # Remove internal fields from output
-        del d["nested_in"]
-        del d["rst_name"]
-        del d["parent_labels"]
-
-        # Rename docs_url to docsUrl for JSON output
+        del d["nested_in"], d["rst_name"], d["parent_labels"]
         d["docsUrl"] = d.pop("docs_url")
-
         if d["children"] is None:
             del d["children"]
         else:
-            # Need to use the ACTUAL children objects to recurse correctly
             d["children"] = [to_dict(c) for c in s.children]
-
-        # Remove deprecated if False
         if not d["deprecated"]:
             del d["deprecated"]
-
         return d
 
-    output = [to_dict(s) for s in top_level_settings]
+    data = [to_dict(s) for s in top_level_settings]
 
-    # Merge extra settings if the file exists
-    extra_settings_path = Path(args.input).parent / "extra_settings.json"
-    if extra_settings_path.exists():
-        print(f"Merging extra settings from {extra_settings_path}...", file=sys.stderr)
+    # Look for extra_settings.json in the data directory
+    extra_settings_path = None
+    if output_path:
+        extra_settings_path = output_path.parent / "extra_settings.json"
+    else:
+        # Fallback to current directory or input parent
+        extra_settings_path = input_path.parent / "extra_settings.json"
+
+    if extra_settings_path and extra_settings_path.exists():
+        print(f"Merging extra settings from {extra_settings_path}", file=sys.stderr)
         extra_settings = json.loads(extra_settings_path.read_text(encoding="utf-8"))
-        output = output + extra_settings
-        # Sort alphabetically by label
-        output.sort(key=lambda s: s["label"])
+        data = data + extra_settings
+        data.sort(key=lambda s: s["label"])
 
-    # Output JSON
-    json_str = json.dumps(output, indent=2 if args.pretty else None, ensure_ascii=False)
+    # Structure final output with metadata
+    output = {
+        "sha": metadata.get("sha") if metadata else "unknown",
+        "date": metadata.get("date") if metadata else "unknown",
+        "url": metadata.get("url") if metadata else "unknown",
+        "data": data,
+    }
 
-    if args.output:
-        with open(args.output, "w", encoding="utf-8") as f:
-            f.write(json_str)
-        print(f"Wrote {len(settings)} settings to {args.output}", file=sys.stderr)
+    json_str = json.dumps(output, indent=2 if pretty else None, ensure_ascii=False)
+    if output_path:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json_str, encoding="utf-8")
+        print(f"Wrote {len(settings)} settings to {output_path}", file=sys.stderr)
     else:
         print(json_str)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Parse Django settings.txt to JSON")
+    parser.add_argument(
+        "input",
+        nargs="?",
+        default="docs_cache/settings.txt",
+        help="Path to settings.txt",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="src/django_lsp/data/settings.json",
+        help="Output JSON file",
+    )
+    args = parser.parse_args()
+    run(Path(args.input), Path(args.output) if args.output else None)
 
 
 if __name__ == "__main__":

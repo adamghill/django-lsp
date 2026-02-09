@@ -65,9 +65,7 @@ class ORMHoverFeature:
             field_name = orm_context.field_name
             word_range = None
             if not field_name:
-                word_info = self._get_word_at_position(
-                    document_uri, line, character
-                )
+                word_info = self._get_word_at_position(document_uri, line, character)
                 if word_info:
                     field_name, word_range = word_info
                     if field_name in {
@@ -99,52 +97,53 @@ class ORMHoverFeature:
                     ),
                 )
 
-            # Handle lookups (field__lookup)
+            # 2. Check if it's a field
             base_field_name = field_name
             lookup_name = None
             if "__" in field_name:
                 base_field_name, lookup_name = field_name.split("__", 1)
 
-            field_analysis = model_info.fields.get(base_field_name)
-            if not field_analysis:
-                return None
-
-            # Convert FieldAnalysis to dict for DocumentationGenerator
-            field_dict = (
-                field_analysis.to_dict()
-                if hasattr(field_analysis, "to_dict")
-                else vars(field_analysis)
-            )
-
-            # Generate documentation
-            if lookup_name:
-                documentation = self.doc_generator.generate_field_lookup_documentation(
-                    field_dict,
-                    base_field_name,
-                    lookup_name,
-                    orm_context.model_name,
-                )
-            else:
-                documentation = self.doc_generator.generate_field_documentation(
-                    field_dict, base_field_name
+            if base_field_name in model_info.fields:
+                field_analysis = model_info.fields[base_field_name]
+                field_dict = (
+                    field_analysis.to_dict()
+                    if hasattr(field_analysis, "to_dict")
+                    else vars(field_analysis)
                 )
 
-            hover_range = (
-                word_range
-                if word_range
-                else types.Range(
-                    start=types.Position(
-                        line=orm_context.range_start_line,
-                        character=orm_context.range_start_character,
-                    ),
-                    end=types.Position(
-                        line=orm_context.range_end_line,
-                        character=orm_context.range_end_character,
-                    ),
-                )
-            )
+                if lookup_name:
+                    documentation = (
+                        self.doc_generator.generate_field_lookup_documentation(
+                            field_dict,
+                            base_field_name,
+                            lookup_name,
+                            orm_context.model_name,
+                        )
+                    )
+                else:
+                    documentation = self.doc_generator.generate_field_documentation(
+                        field_dict, base_field_name
+                    )
 
-            return types.Hover(contents=documentation, range=hover_range)
+                return types.Hover(contents=documentation, range=word_range)
+
+            # 3. Check if it is a function or aggregate
+            if field_name in self.doc_generator._functions:
+                documentation = self.doc_generator.generate_function_documentation(
+                    field_name
+                )
+                return types.Hover(contents=documentation, range=word_range)
+
+            # 4. Check if it is a Meta option
+            # Note: This is a bit optimistic as we don't have full Meta context yet,
+            # but we can try if it's in the catalog
+            if field_name in self.doc_generator._meta_options:
+                documentation = self.doc_generator.generate_meta_option_documentation(
+                    field_name
+                )
+                return types.Hover(contents=documentation, range=word_range)
+
+            return None
 
         except Exception as e:
             logger.exception("Error in ORMHoverFeature.get_hover: %s", e)

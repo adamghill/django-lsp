@@ -1,0 +1,157 @@
+{
+  "sha": "7c54fee7760b1c61fd7f9cb7cc6a2965f4236137",
+  "date": "2026-02-09T12:12:16.549941+00:00",
+  "url": "https://raw.githubusercontent.com/django/django/7c54fee7760b1c61fd7f9cb7cc6a2965f4236137/docs/ref/models/options.txt",
+  "data": [
+    {
+      "name": "abstract",
+      "description": "If `abstract = True`, this model will be an\n    abstract-base-classes.\n\n`app_label`\n-------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#abstract"
+    },
+    {
+      "name": "app_label",
+      "description": "If a model is defined outside of an application in\n    `INSTALLED_APPS`, it must declare which app it belongs to::\n\n        app_label = \"myapp\"\n\n    If you want to represent a model with the format `app_label.object_name`\n    or `app_label.model_name` you can use `model._meta.label`\n    or `model._meta.label_lower` respectively.\n\n`base_manager_name`\n---------------------",
+      "example": "app_label = \"myapp\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#app-label"
+    },
+    {
+      "name": "base_manager_name",
+      "description": "The attribute name of the manager, for example, `'objects'`, to use for\n    the model's `~django.db.models.Model._base_manager`.\n\n`db_table`\n------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#base-manager-name"
+    },
+    {
+      "name": "db_table",
+      "description": "The name of the database table to use for the model::\n\n        db_table = \"music_album\"\n\n.. _table-names:\n\nTable names\n~~~~~~~~~~~\n\nTo save you time, Django automatically derives the name of the database table\nfrom the name of your model class and the app that contains it. A model's\ndatabase table name is constructed by joining the model's \"app label\" -- the\nname you used in :djadmin:`manage.py startapp <startapp>` -- to the model's\nclass name, with an underscore between them.\n\nFor example, if you have an app `bookstore` (as created by\n`manage.py startapp bookstore`), a model defined as `class Book` will have\na database table named `bookstore_book`.\n\nTo override the database table name, use the `db_table` parameter in\n`class Meta`.\n\nIf your database table name is an SQL reserved word, or contains characters\nthat aren't allowed in Python variable names -- notably, the hyphen -- that's\nOK. Django quotes column and table names behind the scenes.",
+      "example": "db_table = \"music_album\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#db-table"
+    },
+    {
+      "name": "db_table_comment",
+      "description": "The comment on the database table to use for this model. It is useful for\ndocumenting database tables for individuals with direct database access who may\nnot be looking at your Django code. For example::\n\n    class Answer(models.Model):\n        question = models.ForeignKey(Question, on_delete=models.CASCADE)\n        answer = models.TextField()\n\n        class Meta:\n            db_table_comment = \"Question answers\"\n\n`db_tablespace`\n-----------------",
+      "example": "class Answer(models.Model):\n    question = models.ForeignKey(Question, on_delete=models.CASCADE)\n    answer = models.TextField()\n\n    class Meta:\n        db_table_comment = \"Question answers\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#db-table-comment"
+    },
+    {
+      "name": "db_tablespace",
+      "description": "The name of the /topics/db/tablespaces to use\n    for this model. The default is the project's `DEFAULT_TABLESPACE`\n    setting, if set. If the backend doesn't support tablespaces, this option is\n    ignored.\n\n`default_manager_name`\n------------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#db-tablespace"
+    },
+    {
+      "name": "default_manager_name",
+      "description": "The name of the manager to use for the model's\n    `~django.db.models.Model._default_manager`.\n\n`default_related_name`\n------------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#default-manager-name"
+    },
+    {
+      "name": "default_related_name",
+      "description": "The name that will be used by default for the relation from a related\n    object back to this one. The default is `<model_name>_set`.\n\n    This option also sets `~ForeignKey.related_query_name`.\n\n    As the reverse name for a field should be unique, be careful if you intend\n    to subclass your model. To work around name collisions, part of the name\n    should contain `'%(app_label)s'` and `'%(model_name)s'`, which are\n    replaced respectively by the name of the application the model is in,\n    and the name of the model, both lowercased. See the paragraph on\n    abstract-related-name.\n\n`get_latest_by`\n-----------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#default-related-name"
+    },
+    {
+      "name": "get_latest_by",
+      "description": "The name of a field or a list of field names in the model, typically\n    `DateField`, `DateTimeField`, or `IntegerField`. This\n    specifies the default field(s) to use in your model `Manager`’s\n    `django.db.models.query.QuerySet.latest()` and\n    `django.db.models.query.QuerySet.earliest()` methods.\n\n    Example::\n\n        # Latest by ascending order_date.\n        get_latest_by = \"order_date\"\n\n        # Latest by priority descending, order_date ascending.\n        get_latest_by = [\"-priority\", \"order_date\"]\n\n    See the `django.db.models.query.QuerySet.latest()` docs for more.\n\n`managed`\n-----------",
+      "example": "# Latest by ascending order_date.\nget_latest_by = \"order_date\"\n\n# Latest by priority descending, order_date ascending.\nget_latest_by = [\"-priority\", \"order_date\"]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#get-latest-by"
+    },
+    {
+      "name": "managed",
+      "description": "Defaults to `True`, meaning Django will create the appropriate database\n    tables in :djadmin:`migrate` or as part of migrations and remove them as\n    part of a :djadmin:`flush` management command. That is, Django\n    *manages* the database tables' lifecycles.\n\n    If `False`, no database table creation, modification, or deletion\n    operations will be performed for this model. This is useful if the model\n    represents an existing table or a database view that has been created by\n    some other means. This is the *only* difference when `managed=False`. All\n    other aspects of model handling are exactly the same as normal. This\n    includes\n\n    #. Adding an automatic primary key field to the model if you don't\n       declare it. To avoid confusion for later code readers, it's\n       recommended to specify all the columns from the database table you\n       are modeling when using unmanaged models.\n\n    #. If a model with `managed=False` contains a\n       `django.db.models.ManyToManyField` that points to another\n       unmanaged model, then the intermediate table for the many-to-many\n       join will also not be created. However, the intermediary table\n       between one managed and one unmanaged model *will* be created.\n\n       If you need to change this default behavior, create the intermediary\n       table as an explicit model (with `managed` set as needed) and use\n       the `ManyToManyField.through` attribute to make the relation\n       use your custom model.\n\n    For tests involving models with `managed=False`, it's up to you to ensure\n    the correct tables are created as part of the test setup.\n\n    If you're interested in changing the Python-level behavior of a model\n    class, you *could* use `managed=False` and create a copy of an existing\n    model. However, there's a better approach for that situation:\n    proxy-models.\n\n`order_with_respect_to`\n-------------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#managed"
+    },
+    {
+      "name": "order_with_respect_to",
+      "description": "Makes this object orderable with respect to the given field, usually a\n    `ForeignKey`. This can be used to make related objects orderable with\n    respect to a parent object. For example, if an `Answer` relates to a\n    `Question` object, and a question has more than one answer, and the order\n    of answers matters, you'd do this::\n\n        from django.db import models\n\n\n        class Question(models.Model):\n            text = models.TextField()\n            # ...\n\n\n        class Answer(models.Model):\n            question = models.ForeignKey(Question, on_delete=models.CASCADE)\n            # ...\n\n            class Meta:\n                order_with_respect_to = \"question\"\n\n    When `order_with_respect_to` is set, two additional methods are provided\n    to retrieve and to set the order of the related objects:\n    `get_RELATED_order()` and `set_RELATED_order()`, where `RELATED` is\n    the lowercased model name. For example, assuming that a `Question` object\n    has multiple related `Answer` objects, the list returned contains the\n    primary keys of the related `Answer` objects:\n\n    .. code-block:: pycon\n\n        >>> question = Question.objects.get(id=1)\n        >>> question.get_answer_order()\n        [1, 2, 3]\n\n    The order of a `Question` object's related `Answer` objects can be set\n    by passing in a list of `Answer` primary keys:\n\n    .. code-block:: pycon\n\n        >>> question.set_answer_order([3, 1, 2])\n\n    The related objects also get two methods, `get_next_in_order()` and\n    `get_previous_in_order()`, which can be used to access those objects in\n    their proper order. Assuming the `Answer` objects are ordered by `id`:\n\n    .. code-block:: pycon\n\n        >>> answer = Answer.objects.get(id=2)\n        >>> answer.get_next_in_order()\n        <Answer: 3>\n        >>> answer.get_previous_in_order()\n        <Answer: 1>",
+      "example": "from django.db import models\n\n\nclass Question(models.Model):\n    text = models.TextField()\n    # ...\n\n\nclass Answer(models.Model):\n    question = models.ForeignKey(Question, on_delete=models.CASCADE)\n    # ...\n\n    class Meta:\n        order_with_respect_to = \"question\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#order-with-respect-to"
+    },
+    {
+      "name": "ordering",
+      "description": "The default ordering for the object, for use when obtaining lists of\n    objects::\n\n        ordering = [\"-order_date\"]\n\n    This is a tuple or list of strings and/or query expressions. Each string is\n    a field name with an optional \"-\" prefix, which indicates descending order.\n    Fields without a leading \"-\" will be ordered ascending. Use the string \"?\"\n    to order randomly.\n\n    For example, to order by a `pub_date` field ascending, use this::\n\n        ordering = [\"pub_date\"]\n\n    To order by `pub_date` descending, use this::\n\n        ordering = [\"-pub_date\"]\n\n    To order by `pub_date` descending, then by `author` ascending, use\n    this::\n\n        ordering = [\"-pub_date\", \"author\"]\n\n    You can also use /ref/models/expressions. To\n    order by `author` ascending and make null values sort last, use this::\n\n        from django.db.models import F\n\n        ordering = [F(\"author\").asc(nulls_last=True)]",
+      "example": "ordering = [\"-order_date\"]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#ordering"
+    },
+    {
+      "name": "permissions",
+      "description": "Extra permissions to enter into the permissions table when creating this\n    object. Add, change, delete, and view permissions are automatically created\n    for each model. This example specifies an extra permission,\n    `can_deliver_pizzas`::\n\n        permissions = [(\"can_deliver_pizzas\", \"Can deliver pizzas\")]\n\n    This is a list or tuple of 2-tuples in the format `(permission_code,\n    human_readable_permission_name)`.\n\n`default_permissions`\n-----------------------",
+      "example": "permissions = [(\"can_deliver_pizzas\", \"Can deliver pizzas\")]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#permissions"
+    },
+    {
+      "name": "default_permissions",
+      "description": "Defaults to `('add', 'change', 'delete', 'view')`. You may customize this\n    list, for example, by setting this to an empty list if your app doesn't\n    require any of the default permissions. It must be specified on the model\n    before the model is created by :djadmin:`migrate` in order to prevent any\n    omitted permissions from being created.\n\n`proxy`\n---------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#default-permissions"
+    },
+    {
+      "name": "proxy",
+      "description": "If `proxy = True`, a model which subclasses another model will be treated\n    as a proxy-models.\n\n`required_db_features`\n------------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#proxy"
+    },
+    {
+      "name": "required_db_features",
+      "description": "List of database features that the current connection should have so that\n    the model is considered during the migration phase. For example, if you set\n    this list to `['gis_enabled']`, the model will only be synchronized on\n    GIS-enabled databases. It's also useful to skip some models when testing\n    with several database backends. Avoid relations between models that may or\n    may not be created as the ORM doesn't handle this.\n\n`required_db_vendor`\n----------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#required-db-features"
+    },
+    {
+      "name": "required_db_vendor",
+      "description": "Name of a supported database vendor that this model is specific to. Current\n    built-in vendor names are: `sqlite`, `postgresql`, `mysql`,\n    `oracle`. If this attribute is not empty and the current connection\n    vendor doesn't match it, the model will not be synchronized.\n\n`select_on_save`\n------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#required-db-vendor"
+    },
+    {
+      "name": "select_on_save",
+      "description": "Determines if Django will use the pre-1.6\n    `django.db.models.Model.save()` algorithm. The old algorithm\n    uses `SELECT` to determine if there is an existing row to be updated.\n    The new algorithm tries an `UPDATE` directly. In some rare cases the\n    `UPDATE` of an existing row isn't visible to Django. An example is the\n    PostgreSQL `ON UPDATE` trigger which returns `NULL`. In such cases the\n    new algorithm will end up doing an `INSERT` even when a row exists in\n    the database.\n\n    Usually there is no need to set this attribute. The default is\n    `False`.\n\n    See `django.db.models.Model.save()` for more about the old and\n    new saving algorithm.\n\n`indexes`\n-----------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#select-on-save"
+    },
+    {
+      "name": "indexes",
+      "description": "A list of /ref/models/indexes that you want to define on\n    the model::\n\n        from django.db import models\n\n\n        class Customer(models.Model):\n            first_name = models.CharField(max_length=100)\n            last_name = models.CharField(max_length=100)\n\n            class Meta:\n                indexes = [\n                    models.Index(fields=[\"last_name\", \"first_name\"]),\n                    models.Index(fields=[\"first_name\"], name=\"first_name_idx\"),\n                ]\n\n`unique_together`\n-------------------",
+      "example": "from django.db import models\n\n\nclass Customer(models.Model):\n    first_name = models.CharField(max_length=100)\n    last_name = models.CharField(max_length=100)\n\n    class Meta:\n        indexes = [\n            models.Index(fields=[\"last_name\", \"first_name\"]),\n            models.Index(fields=[\"first_name\"], name=\"first_name_idx\"),\n        ]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#indexes"
+    },
+    {
+      "name": "unique_together",
+      "description": "",
+      "example": "unique_together = [[\"driver\", \"restaurant\"]]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#unique-together"
+    },
+    {
+      "name": "constraints",
+      "description": "A list of /ref/models/constraints that you want to\n    define on the model::\n\n        from django.db import models\n\n\n        class Customer(models.Model):\n            age = models.IntegerField()\n\n            class Meta:\n                constraints = [\n                    models.CheckConstraint(condition=models.Q(age__gte=18), name=\"age_gte_18\"),\n                ]\n\n`verbose_name`\n----------------",
+      "example": "from django.db import models\n\n\nclass Customer(models.Model):\n    age = models.IntegerField()\n\n    class Meta:\n        constraints = [\n            models.CheckConstraint(condition=models.Q(age__gte=18), name=\"age_gte_18\"),\n        ]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#constraints"
+    },
+    {
+      "name": "verbose_name",
+      "description": "A human-readable name for the object, singular::\n\n        verbose_name = \"pizza\"\n\n    If this isn't given, Django will use a munged version of the class name:\n    `CamelCase` becomes `camel case`.\n\n`verbose_name_plural`\n-----------------------",
+      "example": "verbose_name = \"pizza\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#verbose-name"
+    },
+    {
+      "name": "verbose_name_plural",
+      "description": "The plural name for the object::\n\n        verbose_name_plural = \"stories\"\n\n    If this isn't given, Django will use `~Options.verbose_name` +\n    `\"s\"`.\n\nRead-only `Meta` attributes\n=============================\n\n`label`\n---------",
+      "example": "verbose_name_plural = \"stories\"",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#verbose-name-plural"
+    },
+    {
+      "name": "label",
+      "description": "Representation of the object, returns `app_label.object_name`, e.g.\n    `'polls.Question'`.\n\n`label_lower`\n---------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#label"
+    },
+    {
+      "name": "label_lower",
+      "description": "Representation of the model, returns `app_label.model_name`, e.g.\n    `'polls.question'`.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/options/#label-lower"
+    }
+  ]
+}

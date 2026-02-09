@@ -69,15 +69,48 @@ class OperationProvider:
                 return {"fields": [], "lookups": []}
 
             normalized_typed = (typed_content or "").strip()
-            if operation_name in {"select_related", "prefetch_related", "annotate"}:
-                if not normalized_typed or "(" in normalized_typed:
-                    return self.get_model_fields(model_name, "", available_models)
+            data = {"fields": [], "lookups": []}
 
-            return self.get_model_fields(model_name, normalized_typed, available_models)
+            if operation_name in {"select_related", "prefetch_related"}:
+                data = self.get_model_fields(
+                    model_name, normalized_typed, available_models
+                )
+            elif operation_name in {"annotate", "aggregate"}:
+                data = self.get_model_fields(
+                    model_name, normalized_typed, available_models
+                )
+                # Add some common functions/aggregates if appropriate
+                # This is a bit of a placeholder, we could get the full list from a catalog
+                data["functions"] = [
+                    "Count",
+                    "Sum",
+                    "Avg",
+                    "Max",
+                    "Min",
+                    "StdDev",
+                    "Variance",
+                    "Cast",
+                    "Coalesce",
+                    "Concat",
+                    "Extract",
+                    "Now",
+                    "Trunc",
+                    "Upper",
+                    "Lower",
+                    "Replace",
+                    "Trim",
+                    "Length",
+                ]
+            else:
+                data = self.get_model_fields(
+                    model_name, normalized_typed, available_models
+                )
+
+            return data
 
         except Exception as e:
             logger.error("Error getting operation data: %s", e)
-            return {"fields": [], "lookups": []}
+            return {"fields": [], "lookups": [], "functions": []}
 
     def _analyze_manager_capabilities(self, manager_info: Any) -> Dict[str, Any]:
         """Analyze manager capabilities."""

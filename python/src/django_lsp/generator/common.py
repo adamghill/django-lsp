@@ -3,21 +3,6 @@ Common utilities for Django documentation parsers.
 """
 
 import re
-import sys
-import urllib.request
-from pathlib import Path
-
-
-def download_file(url: str, save_path: Path) -> str:
-    """Download a file from a URL and save it to a path."""
-    print(f"Downloading from {url}...", file=sys.stderr)
-    with urllib.request.urlopen(url) as response:
-        content = response.read().decode("utf-8")
-
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    save_path.write_text(content, encoding="utf-8")
-    print(f"Saved to {save_path}", file=sys.stderr)
-    return content
 
 
 def clean_rst_markup(text: str) -> str:
@@ -43,12 +28,13 @@ def clean_rst_markup(text: str) -> str:
 
     # Remove .. directives and their content if they are block-level
     text = re.sub(
-        r"\.\. (?:versionchanged|versionadded|deprecated)::[^\n]*\n\n(?:    [^\n]*(?:\n|$))*",
+        r"\.\. (?:versionchanged|versionadded|deprecated|admonition|warning|note|tip|important|caution)::[^\n]*\n*(?:    [^\n]*(?:\n|$))*",
         "",
         text,
     )
 
     # Handle direct text blocks (remove directives but keep indentation if it's a code block)
+    # This line is now redundant due to the change above, but keeping it as per instruction to only make the requested change.
     text = re.sub(
         r"\.\. (?:admonition|warning|note|tip|important|caution)::\s*\n", "", text
     )

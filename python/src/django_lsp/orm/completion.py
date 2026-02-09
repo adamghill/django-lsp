@@ -178,7 +178,7 @@ class ORMCompletionFeature:
 
         # Add lookup completions
         for lookup in completion_data.get("lookups", []):
-            # Use unified lookup documentation format
+            # ... existing code ...
             documentation = self.doc_generator.generate_field_lookup_documentation(
                 {
                     "type": lookup.field_type or "Unknown",
@@ -199,6 +199,24 @@ class ORMCompletionFeature:
                     sort_text=f"1_{lookup.name}",
                     insert_text=f"{lookup.name}=",
                     insert_text_format=InsertTextFormat.PlainText,
+                )
+            )
+
+        # Add function completions
+        for func_name in completion_data.get("functions", []):
+            documentation = self.doc_generator.generate_function_documentation(
+                func_name
+            )
+
+            items.append(
+                CompletionItem(
+                    label=func_name,
+                    kind=CompletionItemKind.Function,
+                    detail=f"Django Function: {func_name}",
+                    documentation=documentation,
+                    sort_text=f"2_{func_name}",
+                    insert_text=f"{func_name}($0)",
+                    insert_text_format=InsertTextFormat.Snippet,
                 )
             )
 

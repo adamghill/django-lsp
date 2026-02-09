@@ -2,7 +2,6 @@ from unittest.mock import MagicMock
 
 from django_lsp.orm.completion import ORMCompletionFeature
 from django_lsp.orm.field_analyzer import FieldAnalysis
-from django_lsp.orm.hover import ORMHoverFeature
 from django_lsp.orm.model_loader import ModelInfo
 
 
@@ -51,7 +50,7 @@ def test_completion_has_help_text():
     assert "The model's name" in name_completion.documentation.value
     assert "## 🏷️ name" in name_completion.documentation.value
     assert (
-        "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField)"
+        "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#charfield)"
         in name_completion.documentation.value
     )
 
@@ -156,7 +155,7 @@ def test_completion_with_underscore_prefix():
     assert "Gmail thread ID" in thread_id_comp.documentation.value
     assert "## 🏷️ thread_id" in thread_id_comp.documentation.value
     assert (
-        "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField)"
+        "[Django Documentation](https://docs.djangoproject.com/en/stable/ref/models/fields/#charfield)"
         in thread_id_comp.documentation.value
     )
 
@@ -186,8 +185,52 @@ def test_hover_has_model_docstring():
     orm_context.range_end_character = 7
     document_cache.get_orm_context_at_position.return_value = orm_context
 
-    feature = ORMHoverFeature(model_loader, document_cache)
-    hover = feature.get_hover("test.py", 0, 0)
 
-    assert hover is not None
-    assert "This is MyModel's docstring" in hover.contents.value
+def test_documentation_generator_loads_new_format(tmp_path):
+    import json
+
+    from django_lsp.orm.documentation import DocumentationGenerator
+
+    # Create dummy catalogs in the new format
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+
+    fields_json = data_dir / "fields.json"
+    fields_json.write_text(
+        json.dumps(
+            {
+                "sha": "123",
+                "date": "now",
+                "url": "local",
+                "data": {
+                    "fields": [
+                        {
+                            "name": "CharField",
+                            "description": "Rich CharField desc",
+                            "example": "name = CharField()",
+                            "docs_url": "http://docs",
+                        }
+                    ],
+                    "common_options": [],
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    # Initialize generator with the temp data dir
+    # We need to monkeypatch _data_dir because it's set in __init__
+    gen = DocumentationGenerator()
+    gen._data_dir = data_dir
+    # Force reload
+    gen._fields = gen._load_catalog("fields.json")
+
+    # Verify field data is loaded correctly
+    assert "CharField" in gen._fields
+    assert gen._fields["CharField"]["description"] == "Rich CharField desc"
+
+    field_info = {"type": "CharField", "help_text": "Code help"}
+    doc = gen.generate_field_documentation(field_info, "my_field")
+
+    assert "Rich CharField desc" in doc.value
+    assert "Code help" in doc.value

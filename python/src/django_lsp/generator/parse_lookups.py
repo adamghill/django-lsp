@@ -15,15 +15,11 @@ import re
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Optional
 
 from django_lsp.generator.common import (
     clean_rst_markup,
-    download_file,
     extract_code_example,
-)
-
-QUERYSETS_URL = (
-    "https://raw.githubusercontent.com/django/django/main/docs/ref/models/querysets.txt"
 )
 
 
@@ -95,55 +91,56 @@ def parse_querysets_rst(content: str) -> list[DjangoLookup]:
     return lookups
 
 
+def run(
+    input_path: Path,
+    output_path: Optional[Path] = None,
+    metadata: Optional[dict] = None,
+):
+    """Run the lookups parser with given input and output paths."""
+    if not input_path.exists():
+        print(f"Error: {input_path} not found.", file=sys.stderr)
+        return
+
+    with open(input_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    lookups = parse_querysets_rst(content)
+    data = [asdict(lookup) for lookup in lookups]
+
+    # Structure final output with metadata
+    output = {
+        "sha": metadata.get("sha") if metadata else "unknown",
+        "date": metadata.get("date") if metadata else "unknown",
+        "url": metadata.get("url") if metadata else "unknown",
+        "data": data,
+    }
+
+    json_str = json.dumps(output, indent=2, ensure_ascii=False)
+
+    if output_path:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json_str, encoding="utf-8")
+        print(f"Wrote {len(lookups)} lookups to {output_path}", file=sys.stderr)
+    else:
+        print(json_str)
+
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Parse Django querysets.txt (RST) to JSON"
-    )
+    parser = argparse.ArgumentParser(description="Parse Django querysets.txt to JSON")
     parser.add_argument(
         "input",
         nargs="?",
-        default="querysets.txt",
-        help="Path to querysets.txt RST file",
+        default="docs_cache/models/querysets.txt",
+        help="Path to querysets.txt",
     )
     parser.add_argument(
         "-o",
         "--output",
-        help="Output JSON file",
         default="src/django_lsp/data/lookups.json",
+        help="Output JSON file",
     )
-    parser.add_argument(
-        "--download",
-        "-d",
-        action="store_true",
-        help="Download querysets.txt from Django GitHub repo",
-    )
-
     args = parser.parse_args()
-
-    if args.download:
-        content = download_file(QUERYSETS_URL, Path(args.input))
-    else:
-        if not Path(args.input).exists():
-            print(
-                f"Error: {args.input} not found. Use --download to fetch it.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        with open(args.input, "r", encoding="utf-8") as f:
-            content = f.read()
-
-    lookups = parse_querysets_rst(content)
-    output = [asdict(lookup) for lookup in lookups]
-
-    json_str = json.dumps(output, indent=2, ensure_ascii=False)
-
-    if args.output:
-        output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(json_str, encoding="utf-8")
-        print(f"Wrote {len(lookups)} lookups to {args.output}", file=sys.stderr)
-    else:
-        print(json_str)
+    run(Path(args.input), Path(args.output) if args.output else None)
 
 
 if __name__ == "__main__":

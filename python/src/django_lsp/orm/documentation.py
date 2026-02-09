@@ -10,19 +10,38 @@ class DocumentationGenerator:
 
     def __init__(self, django_version: str = "stable"):
         self.django_version = django_version
-        self._lookups = self._load_lookups()
+        self._data_dir = Path(__file__).parent.parent / "data"
+        self._lookups = self._load_catalog("lookups.json")
+        self._fields = self._load_catalog("fields.json")
+        self._functions = self._load_catalog("functions.json")
+        self._meta_options = self._load_catalog("meta_options.json")
 
-    def _load_lookups(self) -> Dict[str, Dict[str, str]]:
-        """Load lookup documentation from the JSON catalog."""
+    def _load_catalog(self, filename: str) -> Dict[str, Any]:
+        """Load a JSON catalog from the data directory."""
         try:
-            # Look for lookups.json in the data directory
-            data_dir = Path(__file__).parent.parent / "data"
-            lookups_path = data_dir / "lookups.json"
+            path = self._data_dir / filename
+            if path.exists():
+                with open(path, "r", encoding="utf-8") as f:
+                    content = json.load(f)
 
-            if lookups_path.exists():
-                with open(lookups_path, "r", encoding="utf-8") as f:
-                    lookups_list = json.load(f)
-                    return {item["name"]: item for item in lookups_list}
+                    # Extract the data array/dict from the new metadata-enriched structure
+                    if isinstance(content, dict) and "data" in content:
+                        data = content["data"]
+                    else:
+                        data = content
+
+                    if isinstance(data, list):
+                        return {item["name"]: item for item in data}
+                    elif isinstance(data, dict):
+                        # Handle cases like fields.json which has nested keys
+                        if "fields" in data:
+                            # Merge fields and common_options for lookup
+                            combined = {item["name"]: item for item in data["fields"]}
+                            if "common_options" in data:
+                                for opt in data["common_options"]:
+                                    combined[opt["name"]] = opt
+                            return combined
+                        return data
         except Exception:
             pass
         return {}
@@ -74,56 +93,47 @@ class DocumentationGenerator:
     ) -> MarkupContent:
         """
         Generate documentation for a Django field.
-
-        Args:
-            field_info: Field information dictionary
-            field_name: Name of the field
-
-        Returns:
-            MarkupContent with field documentation
         """
         field_type = field_info.get("type", "Unknown")
 
         doc_parts = [f"## 🏷️ {field_name}", "---"]
 
-        # Add field-specific information from FieldAnalysis dict
+        # 1. Start with help_text or docstring from code analysis
         help_text = field_info.get("help_text")
-        docstring = field_info.get("docstring")
         if help_text:
             doc_parts.append(help_text)
-        elif docstring:
-            doc_parts.append(docstring)
 
+        # 2. Add rich description from catalog
+        if field_type in self._fields:
+            field_data = self._fields[field_type]
+            description = field_data.get("description", "")
+            example = field_data.get("example", "")
+
+            if description:
+                doc_parts.append(description)
+            if example:
+                doc_parts.append(f"**Example**:\n```python\n{example}\n```")
+
+        # 3. Structural details
         details = [f"- **Type:** `{field_type}`"]
 
         if field_info.get("verbose_name") and field_info["verbose_name"] != field_name:
             details.append(f"- **Verbose name:** {field_info['verbose_name']}")
 
-        if field_info.get("max_length"):
-            details.append(f"- **Max length:** {field_info['max_length']}")
-
-        if field_info.get("null"):
-            details.append("- **Nullable:** Yes")
-        else:
-            details.append("- **Nullable:** No")
-
-        if field_info.get("blank"):
-            details.append("- **Blank allowed:** Yes")
-        else:
-            details.append("- **Blank allowed:** No")
-
-        if field_info.get("default") is not None:
-            details.append(f"- **Default:** `{field_info['default']}`")
-
-        if field_info.get("related_model"):
-            details.append(f"- **Related model:** `{field_info['related_model']}`")
+        for attr in ["max_length", "null", "blank", "default", "related_model"]:
+            val = field_info.get(attr)
+            if val is not None:
+                label = attr.replace("_", " ").capitalize()
+                details.append(f"- **{label}:** `{val}`")
 
         doc_parts.append("\n".join(details))
 
-        # Add documentation link
-        doc_parts.append(
-            f"\n[Django Documentation](https://docs.djangoproject.com/en/{self.django_version}/ref/models/fields/#django.db.models.{field_type})"
-        )
+        # 4. Add link to documentation
+        docs_url = self._fields.get(field_type, {}).get("docs_url")
+        if not docs_url:
+            docs_url = f"https://docs.djangoproject.com/en/{self.django_version}/ref/models/fields/#django.db.models.{field_type}"
+
+        doc_parts.append(f"\n[Django Documentation]({docs_url})")
 
         return MarkupContent(kind=MarkupKind.Markdown, value="\n\n".join(doc_parts))
 
@@ -208,3 +218,56 @@ class DocumentationGenerator:
 
         # 3. Fallback
         return f"Applies the `{lookup_name}` lookup to the `{field_type}` field."
+
+    def generate_function_documentation(self, name: str) -> MarkupContent:
+        """
+        Generate documentation for a Django database function or aggregate.
+        """
+        doc_parts = [f"## 🧩 {name}", "---"]
+
+        if name in self._functions:
+            func_data = self._functions[name]
+            description = func_data.get("description", "")
+            example = func_data.get("example", "")
+            docs_url = func_data.get("docs_url", "")
+            func_type = func_data.get("type", "expression")
+
+            if description:
+                doc_parts.append(description)
+
+            if example:
+                doc_parts.append(f"**Example**:\n```python\n{example}\n```")
+
+            doc_parts.append(f"- **Type:** {func_type.capitalize()}")
+
+            if docs_url:
+                doc_parts.append(f"\n[Django Documentation]({docs_url})")
+        else:
+            doc_parts.append(f"Django database function or aggregate: `{name}`.")
+
+        return MarkupContent(kind=MarkupKind.Markdown, value="\n\n".join(doc_parts))
+
+    def generate_meta_option_documentation(self, name: str) -> MarkupContent:
+        """
+        Generate documentation for a model Meta option.
+        """
+        doc_parts = [f"## ⚙️ Meta.{name}", "---"]
+
+        if name in self._meta_options:
+            meta_data = self._meta_options[name]
+            description = meta_data.get("description", "")
+            example = meta_data.get("example", "")
+            docs_url = meta_data.get("docs_url", "")
+
+            if description:
+                doc_parts.append(description)
+
+            if example:
+                doc_parts.append(f"**Example**:\n```python\n{example}\n```")
+
+            if docs_url:
+                doc_parts.append(f"\n[Django Documentation]({docs_url})")
+        else:
+            doc_parts.append(f"Django model Meta option: `{name}`.")
+
+        return MarkupContent(kind=MarkupKind.Markdown, value="\n\n".join(doc_parts))
