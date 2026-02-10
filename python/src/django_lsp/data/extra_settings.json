@@ -1,0 +1,11 @@
+[
+    {
+        "label": "BASE_DIR",
+        "name": "BASE_DIR",
+        "description": "The path to the project root directory. Usually defined in `settings.py` as `Path(__file__).resolve().parent.parent`.",
+        "example": "BASE_DIR = Path(__file__).resolve().parent.parent",
+        "default": "None",
+        "docsUrl": "https://docs.djangoproject.com/en/stable/topics/settings/#designating-the-settings",
+        "category": "Project"
+    }
+]

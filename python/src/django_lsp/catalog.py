@@ -20,13 +20,20 @@ class DjangoSetting:
     children: list["DjangoSetting"] = field(default_factory=list)
     name: str = ""
 
-    @property
-    def markdown_docs(self) -> str:
+    def get_markdown_docs(self, django_version: str = "stable") -> str:
         """Return formatted markdown documentation for hover."""
-        parts = [f"## {self.label}"]
+        parts = [f"## ⚙️ {self.label}", "---"]
 
+        details = []
         if self.default:
-            parts.append(f"\n**Default:** `{self.default}`")
+            details.append(f"- **Default:** `{self.default}`")
+        if self.category:
+            details.append(f"- **Category:** {self.category}")
+        if self.deprecated:
+            details.append("- **Status:** ⚠️ Deprecated")
+
+        if details:
+            parts.append("\n".join(details))
 
         if self.description:
             parts.append(f"\n{self.description}")
@@ -35,9 +42,17 @@ class DjangoSetting:
             parts.append(f"\n**Example:**\n```python\n{self.example}\n```")
 
         if self.docs_url:
-            parts.append(f"\n[Django Docs]({self.docs_url})")
+            url = self.docs_url
+            if django_version != "stable":
+                url = url.replace("/stable/", f"/{django_version}/")
+            parts.append(f"\n[Django Documentation]({url})")
 
-        return "\n".join(parts)
+        return "\n\n".join(parts)
+
+    @property
+    def markdown_docs(self) -> str:
+        """Deprecated: use get_markdown_docs(version) instead."""
+        return self.get_markdown_docs()
 
 
 class SettingsCatalog:

@@ -41,6 +41,7 @@ The extension activates for:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `django-lsp.pythonPath` | Auto-detect | Path to Python interpreter |
+| `django-lsp.djangoSettingsModule` | `""` | Value for `DJANGO_SETTINGS_MODULE` to enable ORM introspection |
 | `django-lsp.djangoVersion` | `"5.0"` | Target Django version for docs links |
 | `django-lsp.includeDeprecated` | `false` | Show deprecated settings |
 

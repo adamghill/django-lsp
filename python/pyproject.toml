@@ -21,15 +21,25 @@ classifiers = [
     "Topic :: Text Editors :: Integrated Development Environments (IDE)",
 ]
 
+# Note: These are vendored for the VS Code extension, but are here for running the LSP server directly
 dependencies = [
     "pygls>=2.0",
     "lsprotocol>=2024.0",
+    "parso>=0.8.0",
+]
+
+[project.optional-dependencies]
+# ORM features require Django
+orm = [
+    "django>=4.2",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
     "pytest-asyncio>=0.21",
+    # Include ORM deps for development
+    "django>=4.2",
 ]
 
 [project.scripts]

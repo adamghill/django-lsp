@@ -12,6 +12,7 @@
 
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -47,21 +48,43 @@ export async function activate(context: vscode.ExtensionContext) {
   const lspDir = path.join(context.extensionPath, "django_lsp");
   const vendorDir = path.join(context.extensionPath, "vendor");
 
-  // For development: resolve path to top-level lsp/src
+  // For development: resolve path to top-level python/src
   // context.extensionPath is .../django-lsp/vscode
   // root is .../django-lsp
-  // lspSrc is .../django-lsp/lsp/src
+  // pythonSrc is .../django-lsp/python/src
   const rootDir = path.resolve(context.extensionPath, "..");
-  const lspSrcDir = path.join(rootDir, "lsp", "src");
+  const lspSrcDir = path.join(rootDir, "python", "src");
+
+  const devPackagePath = path.join(lspSrcDir, "django_lsp");
+  const serverCwd = fs.existsSync(devPackagePath) ? lspSrcDir : context.extensionPath;
 
   console.log(`Django Language Server: Server directory: ${lspDir}`);
   console.log(`Django Language Server: Vendor directory: ${vendorDir}`);
-  console.log(`Django Language Server: JSP Source directory (Dev): ${lspSrcDir}`);
+  console.log(`Django Language Server: Python Source directory (Dev): ${lspSrcDir}`);
+  console.log(`Django Language Server: Server cwd: ${serverCwd}`);
 
-  // Set PYTHONPATH to include extension dir (for django_lsp) and vendor dir
-  // AND the top-level source dir for development
-  const pythonPath2 = [context.extensionPath, vendorDir, lspSrcDir].join(path.delimiter);
-  const env = { ...process.env, PYTHONPATH: pythonPath2 };
+  // Set PYTHONPATH to include extension dir (for django_lsp), vendor dir,
+  // top-level source dir for development, and workspace roots.
+  const workspaceRoots = (
+    vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath) || []
+  ).filter(Boolean);
+  const pythonPath2 = [
+    lspSrcDir,
+    context.extensionPath,
+    vendorDir,
+    ...workspaceRoots,
+  ].join(path.delimiter);
+  const env: NodeJS.ProcessEnv = { ...process.env, PYTHONPATH: pythonPath2 };
+
+  const settingsInfo = findSettingsModule();
+  if (settingsInfo) {
+    env.DJANGO_SETTINGS_MODULE = settingsInfo.value;
+    outputChannel.appendLine(
+      `Using DJANGO_SETTINGS_MODULE (${settingsInfo.source}): ${settingsInfo.value}`
+    );
+  } else {
+    outputChannel.appendLine("DJANGO_SETTINGS_MODULE not detected");
+  }
 
   // Server options: run Python with -m django_lsp
   const serverOptions: ServerOptions = {
@@ -69,7 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
       command: pythonPath,
       args: ["-m", "django_lsp"],
       options: {
-        cwd: context.extensionPath,
+        cwd: serverCwd,
         env: env,
       },
     },
@@ -77,7 +100,7 @@ export async function activate(context: vscode.ExtensionContext) {
       command: pythonPath,
       args: ["-m", "django_lsp"],
       options: {
-        cwd: context.extensionPath,
+        cwd: serverCwd,
         env: env,
       },
     },
@@ -85,8 +108,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Client options
   const clientOptions: LanguageClientOptions = {
-    // Only activate for Python settings files
+    // Activate for all Python files (settings and ORM usage)
     documentSelector: [
+      {
+        scheme: "file",
+        language: "python",
+      },
       {
         scheme: "file",
         language: "python",
@@ -150,18 +177,7 @@ async function findPythonPath(): Promise<string | undefined> {
     return configuredPath;
   }
 
-  // 2. Try system python3/python first (most reliable)
-  try {
-    const systemPython = execSync("which python3 || which python", { encoding: "utf-8" }).trim();
-    if (systemPython && isValidPython(systemPython)) {
-      console.log("Django Language Server: Using system Python");
-      return systemPython;
-    }
-  } catch {
-    // which command failed
-  }
-
-  // 3. Try VS Code Python extension's interpreter
+  // 2. Try VS Code Python extension's interpreter
   const pythonExtension = vscode.extensions.getExtension("ms-python.python");
   if (pythonExtension) {
     try {
@@ -183,6 +199,119 @@ async function findPythonPath(): Promise<string | undefined> {
     }
   }
 
+  // 3. Try system python3/python
+  try {
+    const systemPython = execSync("which python3 || which python", { encoding: "utf-8" }).trim();
+    if (systemPython && isValidPython(systemPython)) {
+      console.log("Django Language Server: Using system Python");
+      return systemPython;
+    }
+  } catch {
+    // which command failed
+  }
+
   // Last resort: just try "python3"
   return "python3";
+}
+
+type SettingsModuleInfo = {
+  value: string;
+  source: string;
+};
+
+function findSettingsModule(): SettingsModuleInfo | undefined {
+  const extConfig = vscode.workspace.getConfiguration("django-lsp");
+  const configured = extConfig.get<string>("djangoSettingsModule")?.trim();
+  if (configured) {
+    return { value: configured, source: "settings" };
+  }
+
+  const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
+  for (const folder of workspaceFolders) {
+    const rootPath = folder.uri.fsPath;
+    const managePyPath = findManagePyPath(rootPath);
+    if (managePyPath) {
+      const fromManagePy = parseSettingsModuleFromManagePy(managePyPath);
+      if (fromManagePy) {
+        return {
+          value: fromManagePy,
+          source: `manage.py (${managePyPath})`,
+        };
+      }
+      const fromSettings = findSettingsModuleFromSettingsPy(
+        path.dirname(managePyPath)
+      );
+      if (fromSettings) {
+        return fromSettings;
+      }
+    }
+
+    const fromSettings = findSettingsModuleFromSettingsPy(rootPath);
+    if (fromSettings) {
+      return fromSettings;
+    }
+  }
+
+  return undefined;
+}
+
+function findManagePyPath(rootPath: string): string | undefined {
+  const candidate = path.join(rootPath, "manage.py");
+  if (fs.existsSync(candidate)) {
+    return candidate;
+  }
+
+  try {
+    const entries = fs.readdirSync(rootPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+      const nestedCandidate = path.join(rootPath, entry.name, "manage.py");
+      if (fs.existsSync(nestedCandidate)) {
+        return nestedCandidate;
+      }
+    }
+  } catch (e) {
+    console.log("Django Language Server: Failed to scan for manage.py", e);
+  }
+
+  return undefined;
+}
+
+function parseSettingsModuleFromManagePy(managePyPath: string): string | undefined {
+  try {
+    const contents = fs.readFileSync(managePyPath, "utf8");
+    const match = contents.match(
+      /DJANGO_SETTINGS_MODULE['"]\s*,\s*['"]([A-Za-z0-9_\.]+)['"]/,
+    );
+    return match?.[1];
+  } catch (e) {
+    console.log("Django Language Server: Failed to read manage.py", e);
+    return undefined;
+  }
+}
+
+function findSettingsModuleFromSettingsPy(
+  rootPath: string
+): SettingsModuleInfo | undefined {
+  try {
+    const entries = fs.readdirSync(rootPath, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+      const settingsPath = path.join(rootPath, entry.name, "settings.py");
+      if (fs.existsSync(settingsPath)) {
+        return {
+          value: `${entry.name}.settings`,
+          source: `settings.py (${settingsPath})`,
+        };
+      }
+    }
+  } catch (e) {
+    console.log("Django Language Server: Failed to scan for settings.py", e);
+  }
+
+  return undefined;
 }

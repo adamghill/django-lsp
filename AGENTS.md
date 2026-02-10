@@ -45,6 +45,16 @@ If Django releases a new version or settings change:
 1. `python catalog/parse_settings.py --download`
 2. This updates `catalog/settings.json`.
 
+## 🔍 Dependency & Vendoring Clarity
+This repo has two distinct Python contexts that often confuse agents:
+- `python/` is the source package and uses `uv` with `pyproject.toml` for dependencies.
+- `vscode/` is the VS Code extension bundle and includes a `vendor/` directory that is curated for runtime use.
+
+To avoid thrashing or accidental re-vendoring:
+- `parso` is a required dependency and is vendored into `vscode/vendor` with the other Python runtime libraries.
+- Do not install or copy dependencies into `vscode/vendor` unless the user explicitly asks.
+- Treat `vscode/vendor` as output from the extension packaging process, not a development target.
+
 ## 🧠 Architectural Nuances
 
 ### Contextual Completions

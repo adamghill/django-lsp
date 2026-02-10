@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run VS Code Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/vscode"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/vscode/out/**/*.js"
+            ],
+            "preLaunchTask": "compile-extension"
+        },
+        {
+            "name": "Run VS Code Extension (No Compile)",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/vscode"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/vscode/out/**/*.js"
+            ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

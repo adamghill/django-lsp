@@ -1,0 +1,562 @@
+{
+  "sha": "7c54fee7760b1c61fd7f9cb7cc6a2965f4236137",
+  "date": "2026-02-09T12:12:16.549941+00:00",
+  "url": "https://raw.githubusercontent.com/django/django/7c54fee7760b1c61fd7f9cb7cc6a2965f4236137/docs/ref/models/fields.txt",
+  "data": {
+    "fields": [
+      {
+        "name": "AutoField",
+        "description": "An `IntegerField` that automatically increments according to available\nIDs. You usually won't need to use this directly; a primary key field will\nautomatically be added to your model if you don't specify otherwise. See\nautomatic-primary-key-fields.\n\n`BigAutoField`\n----------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#autofield",
+        "arguments": []
+      },
+      {
+        "name": "BigAutoField",
+        "description": "A 64-bit integer, much like an `AutoField` except that it is\nguaranteed to fit numbers from `1` to `9223372036854775807`.\n\n`BigIntegerField`\n-------------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#bigautofield",
+        "arguments": []
+      },
+      {
+        "name": "BigIntegerField",
+        "description": "A 64-bit integer, much like an `IntegerField` except that it is\nguaranteed to fit numbers from `-9223372036854775808` to\n`9223372036854775807`. The default form widget for this field is a\n`django.forms.NumberInput`.\n\n`BinaryField`\n---------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#bigintegerfield",
+        "arguments": []
+      },
+      {
+        "name": "BinaryField",
+        "description": "A field to store raw binary data. It can be assigned `bytes`,\n`bytearray`, or `memoryview`.\n\nBy default, `BinaryField` sets `~Field.editable` to `False`, in which\ncase it can't be included in a `django.forms.ModelForm`.",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#binaryfield",
+        "arguments": [
+          {
+            "name": "max_length",
+            "description": "Optional. The maximum length (in bytes) of the field. The maximum length is\n    enforced in Django's validation using\n    `django.core.validators.MaxLengthValidator`.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "BooleanField",
+        "description": "A true/false field.\n\nThe default form widget for this field is `django.forms.CheckboxInput`,\nor `django.forms.NullBooleanSelect` if `null=True <Field.null>`.\n\nThe default value of `BooleanField` is `None` when `Field.default`\nisn't defined.\n\n`CompositePrimaryKey`\n-----------------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#booleanfield",
+        "arguments": []
+      },
+      {
+        "name": "CompositePrimaryKey",
+        "description": "A virtual field used for defining a composite primary key.\n\nThis field must be defined as the model's `pk` attribute. If present, Django\nwill create the underlying model table with a composite primary key.\n\nThe `*field_names` argument is a list of positional field names that compose\nthe primary key.\n\nSee /topics/composite-primary-key for more details.\n\n`CharField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#compositeprimarykey",
+        "arguments": []
+      },
+      {
+        "name": "CharField",
+        "description": "A string field, for small- to large-sized strings.\n\nFor large amounts of text, use `django.db.models.TextField`.\n\nThe default form widget for this field is a `django.forms.TextInput`.\n\n`CharField` has the following extra arguments:",
+        "example": "If you are writing an application that must be portable to multiple\ndatabase backends, you should be aware that there are restrictions on\n``max_length`` for some backends. Refer to the :doc:`database backend\nnotes </ref/databases>` for details.",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#charfield",
+        "arguments": [
+          {
+            "name": "max_length",
+            "description": "The maximum length (in characters) of the field. The `max_length`\n    is enforced at the database level and in Django's validation using\n    `django.core.validators.MaxLengthValidator`. It's required for all\n    database backends included with Django except PostgreSQL and SQLite, which\n    supports unlimited `VARCHAR` columns.",
+            "default": ""
+          },
+          {
+            "name": "db_collation",
+            "description": "Optional. The database collation name of the field.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "DateField",
+        "description": "A date, represented in Python by a `datetime.date` instance. Has a few extra,\noptional arguments:",
+        "example": "As currently implemented, setting ``auto_now`` or ``auto_now_add`` to\n``True`` will cause the field to have ``editable=False`` and ``blank=True``\nset.",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#datefield",
+        "arguments": [
+          {
+            "name": "auto_now",
+            "description": "Automatically set the field to now every time the object is saved. Useful\n    for \"last-modified\" timestamps. Note that the current date is *always*\n    used; it's not just a default value that you can override.",
+            "default": ""
+          },
+          {
+            "name": "auto_now_add",
+            "description": "Automatically set the field to now when the object is first created. Useful\n    for creation of timestamps. Note that the current date is *always* used;\n    it's not just a default value that you can override. So even if you\n    set a value for this field when creating the object, it will be ignored.\n    If you want to be able to modify this field, set the following instead of\n    `auto_now_add=True`:",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "DateTimeField",
+        "description": "A date and time, represented in Python by a `datetime.datetime` instance.\nTakes the same extra arguments as `DateField`.\n\nThe default form widget for this field is a single\n`django.forms.DateTimeInput`. The admin uses two separate\n`django.forms.TextInput` widgets with JavaScript shortcuts.\n\n\n    If you have a `datetime.date` instance, it's recommended to convert it to\n    a `datetime.datetime` first. If you don't, `DateTimeField` will\n    use midnight in the default-current-time-zone for\n    the time component. This is true for both storage and comparison. To\n    compare the date portion of a `DateTimeField` with a\n    `datetime.date` instance, use the `date` lookup.\n\n`DecimalField`\n----------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#datetimefield",
+        "arguments": []
+      },
+      {
+        "name": "DecimalField",
+        "description": "A fixed-precision decimal number, represented in Python by a\n`decimal.Decimal` instance. It validates the input using\n`django.core.validators.DecimalValidator`.\n\nHas the following arguments:",
+        "example": "models.DecimalField(..., max_digits=5, decimal_places=2)",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#decimalfield",
+        "arguments": [
+          {
+            "name": "max_digits",
+            "description": "The maximum number of digits allowed in the number. Note that this number\n    must be greater than or equal to `decimal_places`. It's always required\n    on MySQL because this database doesn't support numeric fields with no\n    precision. It's also required for all database backends when\n    `~DecimalField.decimal_places` is provided.",
+            "default": ""
+          },
+          {
+            "name": "decimal_places",
+            "description": "The number of decimal places to store with the number. It's always required\n    on MySQL because this database doesn't support numeric fields with no\n    precision. It's also required for all database backends when\n    `~DecimalField.max_digits` is provided.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "DurationField",
+        "description": "A field for storing periods of time - modeled in Python by\n`python:datetime.timedelta`. When used on PostgreSQL, the data type\nused is an `interval` and on Oracle the data type is `INTERVAL DAY(9) TO\nSECOND(6)`. Otherwise a `bigint` of microseconds is used.",
+        "example": "Arithmetic with ``DurationField`` works in most cases. However on all\ndatabases other than PostgreSQL, comparing the value of a ``DurationField``\nto arithmetic on ``DateTimeField`` instances will not work as expected.",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#durationfield",
+        "arguments": []
+      },
+      {
+        "name": "EmailField",
+        "description": "A `CharField` that checks that the value is a valid email address using\n`django.core.validators.EmailValidator`.\n\n`FileField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#emailfield",
+        "arguments": []
+      },
+      {
+        "name": "FileField",
+        "description": "A file-upload field.",
+        "example": "The ``primary_key`` argument isn't supported and will raise an error if\nused.",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#filefield",
+        "arguments": [
+          {
+            "name": "upload_to",
+            "description": "This attribute provides a way of setting the upload directory and file\n    name, and can be set in two ways. In both cases, the value is passed to the\n    `Storage.save() <django.core.files.storage.Storage.save>()` method.",
+            "default": ""
+          },
+          {
+            "name": "storage",
+            "description": "A storage object, or a callable which returns a storage object. This\n    handles the storage and retrieval of your files. See /topics/files\n    for details on how to provide this object.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "FilePathField",
+        "description": "A `CharField` whose choices are limited to the filenames in a certain\ndirectory on the filesystem. Has some special arguments, of which the first is\n**required**:",
+        "example": "import os\nfrom django.conf import settings\nfrom django.db import models\n\n\ndef images_path():\n    return os.path.join(settings.LOCAL_FILE_DIR, \"images\")\n\n\nclass MyModel(models.Model):\n    file = models.FilePathField(path=images_path)",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#filepathfield",
+        "arguments": [
+          {
+            "name": "path",
+            "description": "Required. The absolute filesystem path to a directory from which this\n    `FilePathField` should get its choices. Example: `\"/home/images\"`.",
+            "default": ""
+          },
+          {
+            "name": "match",
+            "description": "Optional. A regular expression, as a string, that `FilePathField`\n    will use to filter filenames. Note that the regex will be applied to the\n    base filename, not the full path. Example: `\"foo.*\\.txt$\"`, which will\n    match a file called `foo23.txt` but not `bar.txt` or `foo23.png`.",
+            "default": ""
+          },
+          {
+            "name": "recursive",
+            "description": "Optional. Either `True` or `False`. Default is `False`. Specifies\n    whether all subdirectories of `~FilePathField.path` should be\n    included",
+            "default": ""
+          },
+          {
+            "name": "allow_files",
+            "description": "Optional. Either `True` or `False`. Default is `True`. Specifies\n    whether files in the specified location should be included. Either this or\n    `~FilePathField.allow_folders` must be `True`.",
+            "default": ""
+          },
+          {
+            "name": "allow_folders",
+            "description": "Optional. Either `True` or `False`. Default is `False`. Specifies\n    whether folders in the specified location should be included. Either this\n    or `~FilePathField.allow_files` must be `True`.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "FloatField",
+        "description": "A floating-point number represented in Python by a `float` instance.\n\nThe default form widget for this field is a `django.forms.NumberInput`\nwhen `~django.forms.Field.localize` is `False` or\n`django.forms.TextInput` otherwise.\n\n.. _floatfield_vs_decimalfield:",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#floatfield",
+        "arguments": []
+      },
+      {
+        "name": "GeneratedField",
+        "description": "A field that is always computed based on other fields in the model. This field\nis managed and updated by the database itself. Uses the `GENERATED ALWAYS`\nSQL syntax.\n\nThere are two kinds of generated columns: stored and virtual. A stored\ngenerated column is computed when it is written (inserted or updated) and\noccupies storage as if it were a regular column. A virtual generated column\noccupies no storage and is computed when it is read. Thus, a virtual generated\ncolumn is similar to a view and a stored generated column is similar to a\nmaterialized view.",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#generatedfield",
+        "arguments": [
+          {
+            "name": "expression",
+            "description": "An `Expression` used by the database to automatically set the field\n    value each time the model is changed.",
+            "default": ""
+          },
+          {
+            "name": "output_field",
+            "description": "A model field instance to define the field's data type.",
+            "default": ""
+          },
+          {
+            "name": "db_persist",
+            "description": "Determines if the database column should occupy storage as if it were a\n    real column. If `False`, the column acts as a virtual column and does\n    not occupy database storage space.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "GenericIPAddressField",
+        "description": "An IPv4 or IPv6 address, in string format (e.g. `192.0.2.30` or\n`2a02:42fe::4`). The default form widget for this field is a\n`django.forms.TextInput`.\n\nThe IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,\nincluding using the IPv4 format suggested in paragraph 3 of that section, like\n`::ffff:192.0.2.0`. For example, `2001:0::0:01` would be normalized to\n`2001::1`, and `::ffff:0a0a:0a0a` to `::ffff:10.10.10.10`. All characters\nare converted to lowercase.",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#genericipaddressfield",
+        "arguments": [
+          {
+            "name": "protocol",
+            "description": "Limits valid inputs to the specified protocol.\n    Accepted values are `'both'` (default), `'IPv4'`\n    or `'IPv6'`. Matching is case insensitive.",
+            "default": ""
+          },
+          {
+            "name": "unpack_ipv4",
+            "description": "Unpacks IPv4 mapped addresses like `::ffff:192.0.2.1`.\n    If this option is enabled that address would be unpacked to\n    `192.0.2.1`. Default is disabled. Can only be used\n    when `protocol` is set to `'both'`.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "ImageField",
+        "description": "Inherits all attributes and methods from `FileField`, but also\nvalidates that the uploaded object is a valid image.\n\nIn addition to the special attributes that are available for\n`FileField`, an `ImageField` also has `height` and `width`\nattributes.\n\nTo facilitate querying on those attributes, `ImageField` has the\nfollowing optional arguments:",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#imagefield",
+        "arguments": [
+          {
+            "name": "height_field",
+            "description": "Name of a model field which is auto-populated with the height of the image\n    each time an image object is set.",
+            "default": ""
+          },
+          {
+            "name": "width_field",
+            "description": "Name of a model field which is auto-populated with the width of the image\n    each time an image object is set.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "IntegerField",
+        "description": "An integer. Values are only allowed between certain (database-dependent)\npoints. Values from `-2147483648` to `2147483647` are compatible in all\ndatabases supported by Django.\n\nIt uses `django.core.validators.MinValueValidator` and\n`django.core.validators.MaxValueValidator` to validate the input based\non the values that the default database supports.\n\nThe default form widget for this field is a `django.forms.NumberInput`\nwhen `~django.forms.Field.localize` is `False` or\n`django.forms.TextInput` otherwise.\n\n`JSONField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#integerfield",
+        "arguments": []
+      },
+      {
+        "name": "JSONField",
+        "description": "A field for storing JSON encoded data. In Python the data is represented in its\nPython native format: dictionaries, lists, strings, numbers, booleans and\n`None`.\n\n`JSONField` is supported on MariaDB, MySQL, Oracle, PostgreSQL, and SQLite\n(with the sqlite-json1).",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#jsonfield",
+        "arguments": [
+          {
+            "name": "encoder",
+            "description": "An optional `json.JSONEncoder` subclass to serialize data types\n    not supported by the standard JSON serializer (e.g. `datetime.datetime`\n    or `python:uuid.UUID`). For example, you can use the\n    `django.core.serializers.json.DjangoJSONEncoder` class.",
+            "default": ""
+          },
+          {
+            "name": "decoder",
+            "description": "An optional `json.JSONDecoder` subclass to deserialize the value\n    retrieved from the database. The value will be in the format chosen by the\n    custom encoder (most often a string). Your deserialization may need to\n    account for the fact that you can't be certain of the input type. For\n    example, you run the risk of returning a `datetime` that was actually a\n    string that just happened to be in the same format chosen for\n    `datetime`\\s.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "PositiveBigIntegerField",
+        "description": "Like a `PositiveIntegerField`, but only allows values under a certain\n(database-dependent) point. Values from `0` to `9223372036854775807` are\ncompatible in all databases supported by Django.\n\n`PositiveIntegerField`\n------------------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#positivebigintegerfield",
+        "arguments": []
+      },
+      {
+        "name": "PositiveIntegerField",
+        "description": "Like an `IntegerField`, but must be either positive or zero (`0`).\nValues are only allowed under a certain (database-dependent) point. Values from\n`0` to `2147483647` are compatible in all databases supported by Django.\nThe value `0` is accepted for backward compatibility reasons.\n\n`PositiveSmallIntegerField`\n-----------------------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#positiveintegerfield",
+        "arguments": []
+      },
+      {
+        "name": "PositiveSmallIntegerField",
+        "description": "Like a `PositiveIntegerField`, but only allows values under a certain\n(database-dependent) point. Values from `0` to `32767` are compatible in\nall databases supported by Django.\n\n`SlugField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#positivesmallintegerfield",
+        "arguments": []
+      },
+      {
+        "name": "SlugField",
+        "description": ":term:`Slug <slug>` is a newspaper term. A slug is a short label for something,\ncontaining only letters, numbers, underscores or hyphens. They're generally\nused in URLs.\n\nLike a CharField, you can specify `~CharField.max_length` (read the note\nabout database portability and `~CharField.max_length` in that section,\ntoo). If `~CharField.max_length` is not specified, Django will use a\ndefault length of 50.\n\nImplies setting `Field.db_index` to `True`.\n\nIt is often useful to automatically prepopulate a SlugField based on the value\nof some other value. You can do this automatically in the admin using\n`~django.contrib.admin.ModelAdmin.prepopulated_fields`.\n\nIt uses `django.core.validators.validate_slug` or\n`django.core.validators.validate_unicode_slug` for validation.",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#slugfield",
+        "arguments": [
+          {
+            "name": "allow_unicode",
+            "description": "If `True`, the field accepts Unicode letters in addition to ASCII\n    letters. Defaults to `False`.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "SmallAutoField",
+        "description": "Like an `AutoField`, but only allows values under a certain\n(database-dependent) limit. Values from `1` to `32767` are compatible in\nall databases supported by Django.\n\n`SmallIntegerField`\n---------------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#smallautofield",
+        "arguments": []
+      },
+      {
+        "name": "SmallIntegerField",
+        "description": "Like an `IntegerField`, but only allows values under a certain\n(database-dependent) point. Values from `-32768` to `32767` are compatible\nin all databases supported by Django.\n\n`TextField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#smallintegerfield",
+        "arguments": []
+      },
+      {
+        "name": "TextField",
+        "description": "A large text field. The default form widget for this field is a\n`django.forms.Textarea`.\n\nIf you specify a `max_length` attribute, it will be reflected in the\n`django.forms.Textarea` widget of the auto-generated form field.\nHowever it is not enforced at the model or database level. Use a\n`CharField` for that.",
+        "example": "Collation names are not standardized. As such, this will not be\nportable across multiple database backends.",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#textfield",
+        "arguments": [
+          {
+            "name": "db_collation",
+            "description": "Optional. The database collation name of the field.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "TimeField",
+        "description": "A time, represented in Python by a `datetime.time` instance. Accepts the same\nauto-population options as `DateField`.\n\nThe default form widget for this field is a `django.forms.TimeInput`.\nThe admin adds some JavaScript shortcuts.\n\n`URLField`\n------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#timefield",
+        "arguments": []
+      },
+      {
+        "name": "URLField",
+        "description": "A `CharField` for a URL, validated by\n`django.core.validators.URLValidator`.\n\nThe default form widget for this field is a `django.forms.URLInput`.\n\nLike all `CharField` subclasses, `URLField` takes the optional\n`~CharField.max_length` argument. If you don't specify\n`~CharField.max_length`, a default of 200 is used.\n\n`UUIDField`\n-------------",
+        "example": "",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#urlfield",
+        "arguments": []
+      },
+      {
+        "name": "UUIDField",
+        "description": "A field for storing universally unique identifiers. Uses Python's\n`python:uuid.UUID` class. When used on PostgreSQL and MariaDB, this\nstores in a `uuid` datatype, otherwise in a `char(32)`.\n\nUniversally unique identifiers are a good alternative to `AutoField` for\n`~Field.primary_key`. The database will not generate the UUID for you, so\nit is recommended to use `~Field.default`::\n\n    import uuid\n    from django.db import models\n\n\n    class MyUUIDModel(models.Model):\n        id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\n        # other fields\n\nNote that a callable (with the parentheses omitted) is passed to `default`,\nnot an instance of `UUID`.",
+        "example": "import uuid\nfrom django.db import models\n\n\nclass MyUUIDModel(models.Model):\n    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)\n    # other fields",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#uuidfield",
+        "arguments": []
+      },
+      {
+        "name": "ForeignKey",
+        "description": "A many-to-one relationship. Requires two positional arguments: the class to\nwhich the model is related and the `~ForeignKey.on_delete` option::\n\n    from django.db import models\n\n\n    class Manufacturer(models.Model):\n        name = models.TextField()\n\n\n    class Car(models.Model):\n        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)\n\nThe first positional argument can be either a concrete model class or a\nlazy-relationships to a model class.\nrecursive-relationships, where a model has a\nrelationship with itself, are also supported.\n\nSee `ForeignKey.on_delete` for details on the second positional\nargument.\n\nA database index is automatically created on the `ForeignKey`. You can\ndisable this by setting `~Field.db_index` to `False`. You may want to\navoid the overhead of an index if you are creating a foreign key for\nconsistency rather than joins, or if you will be creating an alternative index\nlike a partial or multiple column index.\n\nDatabase Representation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nBehind the scenes, Django appends `\"_id\"` to the field name to create its\ndatabase column name. In the above example, the database table for the `Car`\nmodel will have a `manufacturer_id` column. You can change this explicitly by\nspecifying `~Field.db_column`, however, your code should never have to\ndeal with the database column name (unless you write custom SQL). You'll always\ndeal with the field names of your model object.\n\n.. _foreign-key-arguments:\n\nArguments\n~~~~~~~~~\n\n`ForeignKey` accepts other arguments that define the details of how the\nrelation works.",
+        "example": "from django.db import models\n\n\nclass Manufacturer(models.Model):\n    name = models.TextField()\n\n\nclass Car(models.Model):\n    manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#foreignkey",
+        "arguments": [
+          {
+            "name": "on_delete",
+            "description": "When an object referenced by a `ForeignKey` is deleted, the\n    referring objects need updating. The `on_delete` argument specifies\n    how this is done, and whether Django or your database makes the updates.\n    For example, if you have a nullable `ForeignKey` and you want Django\n    to set it to `None` when the referenced object is deleted::",
+            "default": ""
+          },
+          {
+            "name": "limit_choices_to",
+            "description": "Sets a limit to the available choices for this field when this field is\n    rendered using a `ModelForm` or the admin (by default, all objects\n    in the queryset are available to choose). Either a dictionary, a\n    `django.db.models.Q` object, or a callable returning a\n    dictionary or `django.db.models.Q` object can be used.",
+            "default": ""
+          },
+          {
+            "name": "related_name",
+            "description": "The name to use for the relation from the related object back to this one.\n    It's also the default value for `related_query_name` (the name to use\n    for the reverse filter name from the target model). See the backwards-related-objects for a full explanation\n    and example. Note that you must set this value when defining relations on\n    abstract-base-classes; and when you do so\n    abstract-related-name is available.",
+            "default": ""
+          },
+          {
+            "name": "related_query_name",
+            "description": "The name to use for the reverse filter name from the target model. It\n    defaults to the value of `related_name` or\n    `~django.db.models.Options.default_related_name` if set, otherwise it\n    defaults to the name of the model::",
+            "default": ""
+          },
+          {
+            "name": "to_field",
+            "description": "The field on the related object that the relation is to. By default, Django\n    uses the primary key of the related object. If you reference a different\n    field, that field must have `unique=True`.",
+            "default": ""
+          },
+          {
+            "name": "db_constraint",
+            "description": "Controls whether or not a constraint should be created in the database for\n    this foreign key. The default is `True`, and that's almost certainly what\n    you want; setting this to `False` can be very bad for data integrity.\n    That said, here are some scenarios where you might want to do this:",
+            "default": ""
+          },
+          {
+            "name": "swappable",
+            "description": "Controls the migration framework's reaction if this `ForeignKey`\n    is pointing at a swappable model. If it is `True` - the default -\n    then if the `ForeignKey` is pointing at a model which matches\n    the current value of `settings.AUTH_USER_MODEL` (or another swappable\n    model setting) the relationship will be stored in the migration using\n    a reference to the setting, not to the model directly.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "ManyToManyField",
+        "description": "A many-to-many relationship. Requires a positional argument: the class to\nwhich the model is related, which works exactly the same as it does for\n`ForeignKey`, including recursive-relationships and\nlazy-relationships relationships.\n\nRelated objects can be added, removed, or created with the field's\n`django.db.models.fields.related.RelatedManager`.\n\nDatabase Representation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nBehind the scenes, Django creates an intermediary join table to represent the\nmany-to-many relationship. By default, this table name is generated using the\nname of the many-to-many field and the name of the table for the model that\ncontains it. Since some databases don't support table names above a certain\nlength, these table names will be automatically truncated and a uniqueness hash\nwill be used, e.g. `author_books_9cdf`. You can manually provide the name of\nthe join table using the `~ManyToManyField.db_table` option.\n\n.. _manytomany-arguments:\n\nArguments\n~~~~~~~~~\n\n`ManyToManyField` accepts an extra set of arguments -- all optional --\nthat control how the relationship functions.",
+        "example": "from django.db import models\n\n\nclass Person(models.Model):\n    friends = models.ManyToManyField(\"self\")",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#manytomanyfield",
+        "arguments": [
+          {
+            "name": "related_name",
+            "description": "Same as `ForeignKey.related_name`.",
+            "default": ""
+          },
+          {
+            "name": "related_query_name",
+            "description": "Same as `ForeignKey.related_query_name`.",
+            "default": ""
+          },
+          {
+            "name": "limit_choices_to",
+            "description": "Same as `ForeignKey.limit_choices_to`.",
+            "default": ""
+          },
+          {
+            "name": "symmetrical",
+            "description": "Only used in the definition of ManyToManyFields on self. Consider the\n    following model::",
+            "default": ""
+          },
+          {
+            "name": "through",
+            "description": "Django will automatically generate a table to manage many-to-many\n    relationships. However, if you want to manually specify the intermediary\n    table, you can use the `~ManyToManyField.through` option to specify\n    the Django model that represents the intermediate table that you want to\n    use.",
+            "default": ""
+          },
+          {
+            "name": "through_fields",
+            "description": "Only used when a custom intermediary model is specified. Django will\n    normally determine which fields of the intermediary model to use in order\n    to establish a many-to-many relationship automatically. However,\n    consider the following models::",
+            "default": ""
+          },
+          {
+            "name": "db_table",
+            "description": "The name of the table to create for storing the many-to-many data. If this\n    is not provided, Django will assume a default name based upon the names of:\n    the table for the model defining the relationship and the name of the field\n    itself.",
+            "default": ""
+          },
+          {
+            "name": "db_constraint",
+            "description": "Controls whether or not constraints should be created in the database for\n    the foreign keys in the intermediary table. The default is `True`, and\n    that's almost certainly what you want; setting this to `False` can be\n    very bad for data integrity. That said, here are some scenarios where you\n    might want to do this:",
+            "default": ""
+          },
+          {
+            "name": "swappable",
+            "description": "Controls the migration framework's reaction if this\n    `ManyToManyField` is pointing at a swappable model. If it is\n    `True` - the default - then if the `ManyToManyField` is pointing\n    at a model which matches the current value of `settings.AUTH_USER_MODEL`\n    (or another swappable model setting) the relationship will be stored in the\n    migration using a reference to the setting, not to the model directly.",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "name": "OneToOneField",
+        "description": "A one-to-one relationship. Conceptually, this is similar to a\n`ForeignKey` with `unique=True <Field.unique>`, but the\n\"reverse\" side of the relation will directly return a single object.\n\nThis is most useful as the primary key of a model which \"extends\"\nanother model in some way; multi-table-inheritance is\nimplemented by adding an implicit one-to-one relation from the child\nmodel to the parent model, for example.\n\nOne positional argument is required: the class to which the model will be\nrelated. This works exactly the same as it does for `ForeignKey`,\nincluding all the options regarding recursive-relationships\nand lazy-relationships relationships.\n\nIf you do not specify the `~ForeignKey.related_name` argument for the\n`OneToOneField`, Django will use the lowercase name of the current model as\ndefault value.\n\nWith the following example::\n\n    from django.conf import settings\n    from django.db import models\n\n\n    class MySpecialUser(models.Model):\n        user = models.OneToOneField(\n            settings.AUTH_USER_MODEL,\n            on_delete=models.CASCADE,\n        )\n        supervisor = models.OneToOneField(\n            settings.AUTH_USER_MODEL,\n            on_delete=models.CASCADE,\n            related_name=\"supervisor_of\",\n        )\n\nyour resulting `User` model will have the following attributes:\n\n.. code-block:: pycon\n\n    >>> user = User.objects.get(pk=1)\n    >>> hasattr(user, \"myspecialuser\")\n    True\n    >>> hasattr(user, \"supervisor_of\")\n    True\n\nA `RelatedObjectDoesNotExist` exception is raised when accessing the reverse\nrelationship if an entry in the related table doesn't exist. This is a subclass\nof the target model's `Model.DoesNotExist\n<django.db.models.Model.DoesNotExist>` exception and can be accessed as an\nattribute of the reverse accessor. For example, if a user doesn't have a\nsupervisor designated by `MySpecialUser`::\n\n    try:\n        user.supervisor_of\n    except User.supervisor_of.RelatedObjectDoesNotExist:\n        pass\n\n.. _onetoone-arguments:\n\nAdditionally, `OneToOneField` accepts all of the extra arguments\naccepted by `ForeignKey`, plus one extra argument:",
+        "example": "from django.conf import settings\nfrom django.db import models\n\n\nclass MySpecialUser(models.Model):\n    user = models.OneToOneField(\n        settings.AUTH_USER_MODEL,\n        on_delete=models.CASCADE,\n    )\n    supervisor = models.OneToOneField(\n        settings.AUTH_USER_MODEL,\n        on_delete=models.CASCADE,\n        related_name=\"supervisor_of\",\n    )",
+        "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/fields/#onetoonefield",
+        "arguments": [
+          {
+            "name": "parent_link",
+            "description": "When `True` and used in a model which inherits from another\n    :term:`concrete model`, indicates that this field should be used as the\n    link back to the parent class, rather than the extra\n    `OneToOneField` which would normally be implicitly created by\n    subclassing.",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "common_options": [
+      {
+        "name": "null",
+        "description": "If `True`, Django will store empty values as `NULL` in the database.\nDefault is `False`.",
+        "default": ""
+      },
+      {
+        "name": "blank",
+        "description": "If `True`, the field is allowed to be blank. Default is `False`.",
+        "default": ""
+      },
+      {
+        "name": "choices",
+        "description": "A mapping or iterable in the format described below to use as choices for this\nfield. If choices are given, they're enforced by\nvalidating-objects and the default form widget will\nbe a select box with these choices instead of the standard text field.",
+        "default": ""
+      },
+      {
+        "name": "db_column",
+        "description": "The name of the database column to use for this field. If this isn't given,\nDjango will use the field's name.",
+        "default": ""
+      },
+      {
+        "name": "db_comment",
+        "description": "The comment on the database column to use for this field. It is useful for\ndocumenting fields for individuals with direct database access who may not be\nlooking at your Django code. For example::",
+        "default": ""
+      },
+      {
+        "name": "db_default",
+        "description": "The database-computed default value for this field. This can be a literal value\nor a database function, such as `django.db.models.functions.Now`::",
+        "default": ""
+      },
+      {
+        "name": "db_index",
+        "description": "If `True`, a database index will be created for this field.",
+        "default": ""
+      },
+      {
+        "name": "db_tablespace",
+        "description": "The name of the /topics/db/tablespaces to use for\nthis field's index, if this field is indexed. The default is the project's\n`DEFAULT_INDEX_TABLESPACE` setting, if set, or the\n`~Options.db_tablespace` of the model, if any. If the backend doesn't\nsupport tablespaces for indexes, this option is ignored.",
+        "default": ""
+      },
+      {
+        "name": "default",
+        "description": "The default value for the field. This can be a value or a callable object. If\ncallable it will be called every time a new object is created.",
+        "default": ""
+      },
+      {
+        "name": "editable",
+        "description": "If `False`, the field will not be displayed in the admin or any other\n`django.forms.ModelForm`. It will also be skipped during validating-objects. Default is `True`.",
+        "default": ""
+      },
+      {
+        "name": "error_messages",
+        "description": "The `error_messages` argument lets you override the default messages that the\nfield will raise. Pass in a dictionary with keys matching the error messages\nyou want to override.",
+        "default": ""
+      },
+      {
+        "name": "help_text",
+        "description": "Extra \"help\" text to be displayed with the form widget. It's useful for\ndocumentation even if your field isn't used on a form.",
+        "default": ""
+      },
+      {
+        "name": "primary_key",
+        "description": "If `True`, this field is the primary key for the model.",
+        "default": ""
+      },
+      {
+        "name": "unique",
+        "description": "If `True`, this field must be unique throughout the table.",
+        "default": ""
+      },
+      {
+        "name": "unique_for_date",
+        "description": "Set this to the name of a `DateField` or `DateTimeField` to\nrequire that this field be unique for the value of the date field.",
+        "default": ""
+      },
+      {
+        "name": "unique_for_month",
+        "description": "Like `~Field.unique_for_date`, but requires the field to be unique with\nrespect to the month.",
+        "default": ""
+      },
+      {
+        "name": "unique_for_year",
+        "description": "Like `~Field.unique_for_date` and `~Field.unique_for_month`.",
+        "default": ""
+      },
+      {
+        "name": "verbose_name",
+        "description": "A human-readable name for the field. If the verbose name isn't given, Django\nwill automatically create it using the field's attribute name, converting\nunderscores to spaces. See verbose-field-names.",
+        "default": ""
+      },
+      {
+        "name": "validators",
+        "description": "A list of validators to run for this field. See the /ref/validators for more information.",
+        "default": ""
+      }
+    ]
+  }
+}

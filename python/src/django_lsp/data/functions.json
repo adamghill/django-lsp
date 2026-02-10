@@ -1,0 +1,749 @@
+{
+  "sha": "7c54fee7760b1c61fd7f9cb7cc6a2965f4236137",
+  "date": "2026-02-09T12:12:16.549941+00:00",
+  "url": "https://raw.githubusercontent.com/django/django/7c54fee7760b1c61fd7f9cb7cc6a2965f4236137/docs/ref/models/database-functions.txt",
+  "data": [
+    {
+      "name": "Cast",
+      "description": "Forces the result type of `expression` to be the one from `output_field`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Cast\n    >>> Author.objects.create(age=25, name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(\n    ...     age_as_float=Cast(\"age\", output_field=FloatField()),\n    ... ).get()\n    >>> print(author.age_as_float)\n    25.0\n\n`Coalesce`\n------------",
+      "example": ">>> from django.db.models import FloatField\n>>> from django.db.models.functions import Cast\n>>> Author.objects.create(age=25, name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(\n...     age_as_float=Cast(\"age\", output_field=FloatField()),\n... ).get()\n>>> print(author.age_as_float)\n25.0",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#cast",
+      "type": "function"
+    },
+    {
+      "name": "Coalesce",
+      "description": "Accepts a list of at least two field names or expressions and returns the\nfirst non-null value (note that an empty string is not considered a null\nvalue). Each argument must be of a similar type, so mixing text and numbers\nwill result in a database error.\n\nUsage examples:\n\n.. code-block:: pycon\n\n    >>> # Get a screen name from least to most public\n    >>> from django.db.models import Sum\n    >>> from django.db.models.functions import Coalesce\n    >>> Author.objects.create(name=\"Margaret Smith\", goes_by=\"Maggie\")\n    >>> author = Author.objects.annotate(screen_name=Coalesce(\"alias\", \"goes_by\", \"name\")).get()\n    >>> print(author.screen_name)\n    Maggie\n\n    >>> # Prevent an aggregate Sum() from returning None\n    >>> # The aggregate default argument uses Coalesce() under the hood.\n    >>> aggregated = Author.objects.aggregate(\n    ...     combined_age=Sum(\"age\"),\n    ...     combined_age_default=Sum(\"age\", default=0),\n    ...     combined_age_coalesce=Coalesce(Sum(\"age\"), 0),\n    ... )\n    >>> print(aggregated[\"combined_age\"])\n    None\n    >>> print(aggregated[\"combined_age_default\"])\n    0\n    >>> print(aggregated[\"combined_age_coalesce\"])\n    0",
+      "example": ">>> # Get a screen name from least to most public\n>>> from django.db.models import Sum\n>>> from django.db.models.functions import Coalesce\n>>> Author.objects.create(name=\"Margaret Smith\", goes_by=\"Maggie\")\n>>> author = Author.objects.annotate(screen_name=Coalesce(\"alias\", \"goes_by\", \"name\")).get()\n>>> print(author.screen_name)\nMaggie\n\n>>> # Prevent an aggregate Sum() from returning None\n>>> # The aggregate default argument uses Coalesce() under the hood.\n>>> aggregated = Author.objects.aggregate(\n...     combined_age=Sum(\"age\"),\n...     combined_age_default=Sum(\"age\", default=0),\n...     combined_age_coalesce=Coalesce(Sum(\"age\"), 0),\n... )\n>>> print(aggregated[\"combined_age\"])\nNone\n>>> print(aggregated[\"combined_age_default\"])\n0\n>>> print(aggregated[\"combined_age_coalesce\"])\n0",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#coalesce",
+      "type": "function"
+    },
+    {
+      "name": "Collate",
+      "description": "Takes an expression and a collation name to query against.\n\nFor example, to filter case-insensitively in SQLite:\n\n.. code-block:: pycon\n\n    >>> Author.objects.filter(name=Collate(Value(\"john\"), \"nocase\"))\n    <QuerySet [<Author: John>, <Author: john>]>\n\nIt can also be used when ordering, for example with PostgreSQL:\n\n.. code-block:: pycon\n\n    >>> Author.objects.order_by(Collate(\"name\", \"et-x-icu\"))\n    <QuerySet [<Author: Ursula>, <Author: Veronika>, <Author: Ülle>]>\n\n`Greatest`\n------------",
+      "example": ">>> Author.objects.filter(name=Collate(Value(\"john\"), \"nocase\"))\n<QuerySet [<Author: John>, <Author: john>]>",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#collate",
+      "type": "function"
+    },
+    {
+      "name": "Greatest",
+      "description": "Accepts a list of at least two field names or expressions and returns the\ngreatest value. Each argument must be of a similar type, so mixing text and\nnumbers will result in a database error.\n\nUsage example::\n\n    class Blog(models.Model):\n        body = models.TextField()\n        modified = models.DateTimeField(auto_now=True)\n\n\n    class Comment(models.Model):\n        body = models.TextField()\n        modified = models.DateTimeField(auto_now=True)\n        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Greatest\n    >>> blog = Blog.objects.create(body=\"Greatest is the best.\")\n    >>> comment = Comment.objects.create(body=\"No, Least is better.\", blog=blog)\n    >>> comments = Comment.objects.annotate(last_updated=Greatest(\"modified\", \"blog__modified\"))\n    >>> annotated_comment = comments.get()\n\n`annotated_comment.last_updated` will be the most recent of `blog.modified`\nand `comment.modified`.",
+      "example": "class Blog(models.Model):\n    body = models.TextField()\n    modified = models.DateTimeField(auto_now=True)\n\n\nclass Comment(models.Model):\n    body = models.TextField()\n    modified = models.DateTimeField(auto_now=True)\n    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#greatest",
+      "type": "function"
+    },
+    {
+      "name": "Least",
+      "description": "Accepts a list of at least two field names or expressions and returns the least\nvalue. Each argument must be of a similar type, so mixing text and numbers will\nresult in a database error.",
+      "example": "The behavior of ``Least`` when one or more expression may be ``null``\nvaries between databases:\n\n- PostgreSQL: ``Least`` will return the smallest non-null expression,\n  or ``null`` if all expressions are ``null``.\n- SQLite, Oracle, and MySQL: If any expression is ``null``, ``Least``\n  will return ``null``.\n\nThe PostgreSQL behavior can be emulated using ``Coalesce`` if you know\na sensible maximum value to provide as a default.",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#least",
+      "type": "function"
+    },
+    {
+      "name": "NullIf",
+      "description": "Accepts two expressions and returns `None` if they are equal, otherwise\nreturns `expression1`.",
+      "example": "class Experiment(models.Model):\n    start_datetime = models.DateTimeField()\n    start_date = models.DateField(null=True, blank=True)\n    start_time = models.TimeField(null=True, blank=True)\n    end_datetime = models.DateTimeField(null=True, blank=True)\n    end_date = models.DateField(null=True, blank=True)\n    end_time = models.TimeField(null=True, blank=True)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#nullif",
+      "type": "function"
+    },
+    {
+      "name": "Extract",
+      "description": "Extracts a component of a date as a number.\n\nTakes an `expression` representing a `DateField`, `DateTimeField`,\n`TimeField`, or `DurationField` and a `lookup_name`, and returns the part\nof the date referenced by `lookup_name` as an `IntegerField`.\nDjango usually uses the databases' extract function, so you may use any\n`lookup_name` that your database supports. A `tzinfo` subclass, usually\nprovided by `zoneinfo`, can be passed to extract a value in a specific\ntimezone.\n\nGiven the datetime `2015-06-15 23:30:01.000321+00:00`, the built-in\n`lookup_name`\\s return:\n\n* \"year\": 2015\n* \"iso_year\": 2015\n* \"quarter\": 2\n* \"month\": 6\n* \"day\": 15\n* \"week\": 25\n* \"week_day\": 2\n* \"iso_week_day\": 1\n* \"hour\": 23\n* \"minute\": 30\n* \"second\": 1\n\nIf a different timezone like `Australia/Melbourne` is active in Django, then\nthe datetime is converted to the timezone before the value is extracted. The\ntimezone offset for Melbourne in the example date above is +10:00. The values\nreturned when this timezone is active will be the same as above except for:\n\n* \"day\": 16\n* \"week_day\": 3\n* \"iso_week_day\": 2\n* \"hour\": 9",
+      "example": ">>> from datetime import datetime\n>>> dt = datetime(2015, 6, 15)\n>>> (dt.isoweekday() % 7) + 1\n2",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extract",
+      "type": "function"
+    },
+    {
+      "name": "ExtractYear",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractyear",
+      "type": "function"
+    },
+    {
+      "name": "ExtractIsoYear",
+      "description": "Returns the ISO-8601 week-numbering year.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractisoyear",
+      "type": "function"
+    },
+    {
+      "name": "ExtractMonth",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractmonth",
+      "type": "function"
+    },
+    {
+      "name": "ExtractDay",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractday",
+      "type": "function"
+    },
+    {
+      "name": "ExtractWeekDay",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractweekday",
+      "type": "function"
+    },
+    {
+      "name": "ExtractIsoWeekDay",
+      "description": "Returns the ISO-8601 week day with day 1 being Monday and day 7 being\n    Sunday.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractisoweekday",
+      "type": "function"
+    },
+    {
+      "name": "ExtractWeek",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractweek",
+      "type": "function"
+    },
+    {
+      "name": "ExtractQuarter",
+      "description": "",
+      "example": ">>> from datetime import UTC, datetime\n>>> from django.db.models.functions import (\n...     ExtractDay,\n...     ExtractMonth,\n...     ExtractQuarter,\n...     ExtractWeek,\n...     ExtractIsoWeekDay,\n...     ExtractWeekDay,\n...     ExtractIsoYear,\n...     ExtractYear,\n... )\n>>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=UTC)\n>>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=UTC)\n>>> Experiment.objects.create(\n...     start_datetime=start_2015,\n...     start_date=start_2015.date(),\n...     end_datetime=end_2015,\n...     end_date=end_2015.date(),\n... )\n>>> Experiment.objects.annotate(\n...     year=ExtractYear(\"start_date\"),\n...     isoyear=ExtractIsoYear(\"start_date\"),\n...     quarter=ExtractQuarter(\"start_date\"),\n...     month=ExtractMonth(\"start_date\"),\n...     week=ExtractWeek(\"start_date\"),\n...     day=ExtractDay(\"start_date\"),\n...     weekday=ExtractWeekDay(\"start_date\"),\n...     isoweekday=ExtractIsoWeekDay(\"start_date\"),\n... ).values(\n...     \"year\",\n...     \"isoyear\",\n...     \"quarter\",\n...     \"month\",\n...     \"week\",\n...     \"day\",\n...     \"weekday\",\n...     \"isoweekday\",\n... ).get(\n...     end_date__year=ExtractYear(\"start_date\")\n... )\n{'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,\n 'day': 15, 'weekday': 2, 'isoweekday': 1}",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractquarter",
+      "type": "function"
+    },
+    {
+      "name": "ExtractHour",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extracthour",
+      "type": "function"
+    },
+    {
+      "name": "ExtractMinute",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractminute",
+      "type": "function"
+    },
+    {
+      "name": "ExtractSecond",
+      "description": "",
+      "example": ">>> from datetime import UTC, datetime\n>>> from django.db.models.functions import (\n...     ExtractDay,\n...     ExtractHour,\n...     ExtractMinute,\n...     ExtractMonth,\n...     ExtractQuarter,\n...     ExtractSecond,\n...     ExtractWeek,\n...     ExtractIsoWeekDay,\n...     ExtractWeekDay,\n...     ExtractIsoYear,\n...     ExtractYear,\n... )\n>>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=UTC)\n>>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=UTC)\n>>> Experiment.objects.create(\n...     start_datetime=start_2015,\n...     start_date=start_2015.date(),\n...     end_datetime=end_2015,\n...     end_date=end_2015.date(),\n... )\n>>> Experiment.objects.annotate(\n...     year=ExtractYear(\"start_datetime\"),\n...     isoyear=ExtractIsoYear(\"start_datetime\"),\n...     quarter=ExtractQuarter(\"start_datetime\"),\n...     month=ExtractMonth(\"start_datetime\"),\n...     week=ExtractWeek(\"start_datetime\"),\n...     day=ExtractDay(\"start_datetime\"),\n...     weekday=ExtractWeekDay(\"start_datetime\"),\n...     isoweekday=ExtractIsoWeekDay(\"start_datetime\"),\n...     hour=ExtractHour(\"start_datetime\"),\n...     minute=ExtractMinute(\"start_datetime\"),\n...     second=ExtractSecond(\"start_datetime\"),\n... ).values(\n...     \"year\",\n...     \"isoyear\",\n...     \"month\",\n...     \"week\",\n...     \"day\",\n...     \"weekday\",\n...     \"isoweekday\",\n...     \"hour\",\n...     \"minute\",\n...     \"second\",\n... ).get(\n...     end_datetime__year=ExtractYear(\"start_datetime\")\n... )\n{'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,\n 'day': 15, 'weekday': 2, 'isoweekday': 1, 'hour': 23, 'minute': 30,\n 'second': 1}",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#extractsecond",
+      "type": "function"
+    },
+    {
+      "name": "Now",
+      "description": "Returns the database server's current date and time when the query is executed,\ntypically using the SQL `CURRENT_TIMESTAMP`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Now\n    >>> Article.objects.filter(published__lte=Now())\n    <QuerySet [<Article: How to Django>]>",
+      "example": ">>> from django.db.models.functions import Now\n>>> Article.objects.filter(published__lte=Now())\n<QuerySet [<Article: How to Django>]>",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#now",
+      "type": "function"
+    },
+    {
+      "name": "Trunc",
+      "description": "Truncates a date up to a significant component.\n\nWhen you only care if something happened in a particular year, hour, or day,\nbut not the exact second, then `Trunc` (and its subclasses) can be useful to\nfilter or aggregate your data. For example, you can use `Trunc` to calculate\nthe number of sales per day.\n\n`Trunc` takes a single `expression`, representing a `DateField`,\n`TimeField`, or `DateTimeField`, a `kind` representing a date or time\npart, and an `output_field` that's either `DateTimeField()`,\n`TimeField()`, or `DateField()`. It returns a datetime, date, or time\ndepending on `output_field`, with fields up to `kind` set to their minimum\nvalue. If `output_field` is omitted, it will default to the `output_field`\nof `expression`. A `tzinfo` subclass, usually provided by `zoneinfo`,\ncan be passed to truncate a value in a specific timezone.\n\nGiven the datetime `2015-06-15 14:30:50.000321+00:00`, the built-in\n`kind`\\s return:\n\n* \"year\": 2015-01-01 00:00:00+00:00\n* \"quarter\": 2015-04-01 00:00:00+00:00\n* \"month\": 2015-06-01 00:00:00+00:00\n* \"week\": 2015-06-15 00:00:00+00:00\n* \"day\": 2015-06-15 00:00:00+00:00\n* \"hour\": 2015-06-15 14:00:00+00:00\n* \"minute\": 2015-06-15 14:30:00+00:00\n* \"second\": 2015-06-15 14:30:50+00:00\n\nIf a different timezone like `Australia/Melbourne` is active in Django, then\nthe datetime is converted to the new timezone before the value is truncated.\nThe timezone offset for Melbourne in the example date above is +10:00. The\nvalues returned when this timezone is active will be:\n\n* \"year\": 2015-01-01 00:00:00+11:00\n* \"quarter\": 2015-04-01 00:00:00+10:00\n* \"month\": 2015-06-01 00:00:00+10:00\n* \"week\": 2015-06-16 00:00:00+10:00\n* \"day\": 2015-06-16 00:00:00+10:00\n* \"hour\": 2015-06-16 00:00:00+10:00\n* \"minute\": 2015-06-16 00:30:00+10:00\n* \"second\": 2015-06-16 00:30:50+10:00\n\nThe year has an offset of +11:00 because the result transitioned into daylight\nsaving time.\n\nEach `kind` above has a corresponding `Trunc` subclass (listed below) that\nshould typically be used instead of the more verbose equivalent,\ne.g. use `TruncYear(...)` rather than `Trunc(..., kind='year')`.\n\nThe subclasses are all defined as transforms, but they aren't registered with\nany fields, because the lookup names are already reserved by the `Extract`\nsubclasses.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from datetime import datetime\n    >>> from django.db.models import Count, DateTimeField\n    >>> from django.db.models.functions import Trunc\n    >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321))\n    >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 40, 2, 123))\n    >>> Experiment.objects.create(start_datetime=datetime(2015, 12, 25, 10, 5, 27, 999))\n    >>> experiments_per_day = (\n    ...     Experiment.objects.annotate(\n    ...         start_day=Trunc(\"start_datetime\", \"day\", output_field=DateTimeField())\n    ...     )\n    ...     .values(\"start_day\")\n    ...     .annotate(experiments=Count(\"id\"))\n    ... )\n    >>> for exp in experiments_per_day:\n    ...     print(exp[\"start_day\"], exp[\"experiments\"])\n    ...\n    2015-06-15 00:00:00 2\n    2015-12-25 00:00:00 1\n    >>> experiments = Experiment.objects.annotate(\n    ...     start_day=Trunc(\"start_datetime\", \"day\", output_field=DateTimeField())\n    ... ).filter(start_day=datetime(2015, 6, 15))\n    >>> for exp in experiments:\n    ...     print(exp.start_datetime)\n    ...\n    2015-06-15 14:30:50.000321\n    2015-06-15 14:40:02.000123\n\n`DateField` truncation\n~~~~~~~~~~~~~~~~~~~~~~~~",
+      "example": ">>> from datetime import datetime\n>>> from django.db.models import Count, DateTimeField\n>>> from django.db.models.functions import Trunc\n>>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321))\n>>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 40, 2, 123))\n>>> Experiment.objects.create(start_datetime=datetime(2015, 12, 25, 10, 5, 27, 999))\n>>> experiments_per_day = (\n...     Experiment.objects.annotate(\n...         start_day=Trunc(\"start_datetime\", \"day\", output_field=DateTimeField())\n...     )\n...     .values(\"start_day\")\n...     .annotate(experiments=Count(\"id\"))\n... )\n>>> for exp in experiments_per_day:\n...     print(exp[\"start_day\"], exp[\"experiments\"])\n...\n2015-06-15 00:00:00 2\n2015-12-25 00:00:00 1\n>>> experiments = Experiment.objects.annotate(\n...     start_day=Trunc(\"start_datetime\", \"day\", output_field=DateTimeField())\n... ).filter(start_day=datetime(2015, 6, 15))\n>>> for exp in experiments:\n...     print(exp.start_datetime)\n...\n2015-06-15 14:30:50.000321\n2015-06-15 14:40:02.000123",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#trunc",
+      "type": "function"
+    },
+    {
+      "name": "TruncYear",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncyear",
+      "type": "function"
+    },
+    {
+      "name": "TruncMonth",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncmonth",
+      "type": "function"
+    },
+    {
+      "name": "TruncWeek",
+      "description": "Truncates to midnight on the Monday of the week.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncweek",
+      "type": "function"
+    },
+    {
+      "name": "TruncQuarter",
+      "description": "",
+      "example": ">>> from datetime import UTC, datetime\n>>> from django.db.models import Count\n>>> from django.db.models.functions import TruncMonth, TruncYear\n>>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)\n>>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=UTC)\n>>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=UTC)\n>>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())\n>>> Experiment.objects.create(start_datetime=start2, start_date=start2.date())\n>>> Experiment.objects.create(start_datetime=start3, start_date=start3.date())\n>>> experiments_per_year = (\n...     Experiment.objects.annotate(year=TruncYear(\"start_date\"))\n...     .values(\"year\")\n...     .annotate(experiments=Count(\"id\"))\n... )\n>>> for exp in experiments_per_year:\n...     print(exp[\"year\"], exp[\"experiments\"])\n...\n2014-01-01 1\n2015-01-01 2\n\n>>> import zoneinfo\n>>> melb = zoneinfo.ZoneInfo(\"Australia/Melbourne\")\n>>> experiments_per_month = (\n...     Experiment.objects.annotate(month=TruncMonth(\"start_datetime\", tzinfo=melb))\n...     .values(\"month\")\n...     .annotate(experiments=Count(\"id\"))\n... )\n>>> for exp in experiments_per_month:\n...     print(exp[\"month\"], exp[\"experiments\"])\n...\n2015-06-01 00:00:00+10:00 1\n2016-01-01 00:00:00+11:00 1\n2014-06-01 00:00:00+10:00 1",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncquarter",
+      "type": "function"
+    },
+    {
+      "name": "TruncDate",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncdate",
+      "type": "function"
+    },
+    {
+      "name": "TruncTime",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#trunctime",
+      "type": "function"
+    },
+    {
+      "name": "TruncDay",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncday",
+      "type": "function"
+    },
+    {
+      "name": "TruncHour",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#trunchour",
+      "type": "function"
+    },
+    {
+      "name": "TruncMinute",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncminute",
+      "type": "function"
+    },
+    {
+      "name": "TruncSecond",
+      "description": "",
+      "example": ">>> from datetime import UTC, date, datetime\n>>> from django.db.models import Count\n>>> from django.db.models.functions import (\n...     TruncDate,\n...     TruncDay,\n...     TruncHour,\n...     TruncMinute,\n...     TruncSecond,\n... )\n>>> import zoneinfo\n>>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)\n>>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())\n>>> melb = zoneinfo.ZoneInfo(\"Australia/Melbourne\")\n>>> Experiment.objects.annotate(\n...     date=TruncDate(\"start_datetime\"),\n...     day=TruncDay(\"start_datetime\", tzinfo=melb),\n...     hour=TruncHour(\"start_datetime\", tzinfo=melb),\n...     minute=TruncMinute(\"start_datetime\"),\n...     second=TruncSecond(\"start_datetime\"),\n... ).values(\"date\", \"day\", \"hour\", \"minute\", \"second\").get()\n{'date': datetime.date(2014, 6, 15),\n 'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),\n 'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),\n 'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=UTC),\n 'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=UTC)\n}",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncsecond",
+      "type": "function"
+    },
+    {
+      "name": "TruncHour",
+      "description": ":noindex:",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#trunchour",
+      "type": "function"
+    },
+    {
+      "name": "TruncMinute",
+      "description": ":noindex:",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncminute",
+      "type": "function"
+    },
+    {
+      "name": "TruncSecond",
+      "description": ":noindex:",
+      "example": ">>> from datetime import UTC, datetime\n>>> from django.db.models import Count, TimeField\n>>> from django.db.models.functions import TruncHour\n>>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=UTC)\n>>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=UTC)\n>>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=UTC)\n>>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())\n>>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())\n>>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())\n>>> experiments_per_hour = (\n...     Experiment.objects.annotate(\n...         hour=TruncHour(\"start_datetime\", output_field=TimeField()),\n...     )\n...     .values(\"hour\")\n...     .annotate(experiments=Count(\"id\"))\n... )\n>>> for exp in experiments_per_hour:\n...     print(exp[\"hour\"], exp[\"experiments\"])\n...\n14:00:00 2\n17:00:00 1\n\n>>> import zoneinfo\n>>> melb = zoneinfo.ZoneInfo(\"Australia/Melbourne\")\n>>> experiments_per_hour = (\n...     Experiment.objects.annotate(\n...         hour=TruncHour(\"start_datetime\", tzinfo=melb),\n...     )\n...     .values(\"hour\")\n...     .annotate(experiments=Count(\"id\"))\n... )\n>>> for exp in experiments_per_hour:\n...     print(exp[\"hour\"], exp[\"experiments\"])\n...\n2014-06-16 00:00:00+10:00 2\n2016-01-01 04:00:00+11:00 1",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#truncsecond",
+      "type": "function"
+    },
+    {
+      "name": "JSONArray",
+      "description": "Accepts a list of field names or expressions and returns a JSON array\ncontaining those values.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import F\n    >>> from django.db.models.functions import JSONArray, Lower\n    >>> Author.objects.create(name=\"Margaret Smith\", alias=\"msmith\", age=25)\n    >>> author = Author.objects.annotate(\n    ...     json_array=JSONArray(\n    ...         Lower(\"name\"),\n    ...         \"alias\",\n    ...         F(\"age\") * 2,\n    ...     )\n    ... ).get()\n    >>> author.json_array\n    ['margaret smith', 'msmith', 50]\n\n`JSONObject`\n--------------",
+      "example": ">>> from django.db.models import F\n>>> from django.db.models.functions import JSONArray, Lower\n>>> Author.objects.create(name=\"Margaret Smith\", alias=\"msmith\", age=25)\n>>> author = Author.objects.annotate(\n...     json_array=JSONArray(\n...         Lower(\"name\"),\n...         \"alias\",\n...         F(\"age\") * 2,\n...     )\n... ).get()\n>>> author.json_array\n['margaret smith', 'msmith', 50]",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#jsonarray",
+      "type": "function"
+    },
+    {
+      "name": "JSONObject",
+      "description": "Takes a list of key-value pairs and returns a JSON object containing those\npairs.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import F\n    >>> from django.db.models.functions import JSONObject, Lower\n    >>> Author.objects.create(name=\"Margaret Smith\", alias=\"msmith\", age=25)\n    >>> author = Author.objects.annotate(\n    ...     json_object=JSONObject(\n    ...         name=Lower(\"name\"),\n    ...         alias=\"alias\",\n    ...         age=F(\"age\") * 2,\n    ...     )\n    ... ).get()\n    >>> author.json_object\n    {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}\n\n.. _math-functions:\n\nMath Functions\n==============\n\nWe'll be using the following model in math function examples::\n\n    class Vector(models.Model):\n        x = models.FloatField()\n        y = models.FloatField()\n\n`Abs`\n-------",
+      "example": ">>> from django.db.models import F\n>>> from django.db.models.functions import JSONObject, Lower\n>>> Author.objects.create(name=\"Margaret Smith\", alias=\"msmith\", age=25)\n>>> author = Author.objects.annotate(\n...     json_object=JSONObject(\n...         name=Lower(\"name\"),\n...         alias=\"alias\",\n...         age=F(\"age\") * 2,\n...     )\n... ).get()\n>>> author.json_object\n{'name': 'margaret smith', 'alias': 'msmith', 'age': 50}",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#jsonobject",
+      "type": "function"
+    },
+    {
+      "name": "Abs",
+      "description": "Returns the absolute value of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Abs\n    >>> Vector.objects.create(x=-0.5, y=1.1)\n    >>> vector = Vector.objects.annotate(x_abs=Abs(\"x\"), y_abs=Abs(\"y\")).get()\n    >>> vector.x_abs, vector.y_abs\n    (0.5, 1.1)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Abs\n    >>> FloatField.register_lookup(Abs)\n    >>> # Get vectors inside the unit cube\n    >>> vectors = Vector.objects.filter(x__abs__lt=1, y__abs__lt=1)\n\n`ACos`\n--------",
+      "example": ">>> from django.db.models.functions import Abs\n>>> Vector.objects.create(x=-0.5, y=1.1)\n>>> vector = Vector.objects.annotate(x_abs=Abs(\"x\"), y_abs=Abs(\"y\")).get()\n>>> vector.x_abs, vector.y_abs\n(0.5, 1.1)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#abs",
+      "type": "function"
+    },
+    {
+      "name": "ACos",
+      "description": "Returns the arccosine of a numeric field or expression. The expression value\nmust be within the range -1 to 1.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import ACos\n    >>> Vector.objects.create(x=0.5, y=-0.9)\n    >>> vector = Vector.objects.annotate(x_acos=ACos(\"x\"), y_acos=ACos(\"y\")).get()\n    >>> vector.x_acos, vector.y_acos\n    (1.0471975511965979, 2.6905658417935308)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import ACos\n    >>> FloatField.register_lookup(ACos)\n    >>> # Get vectors whose arccosine is less than 1\n    >>> vectors = Vector.objects.filter(x__acos__lt=1, y__acos__lt=1)\n\n`ASin`\n--------",
+      "example": ">>> from django.db.models.functions import ACos\n>>> Vector.objects.create(x=0.5, y=-0.9)\n>>> vector = Vector.objects.annotate(x_acos=ACos(\"x\"), y_acos=ACos(\"y\")).get()\n>>> vector.x_acos, vector.y_acos\n(1.0471975511965979, 2.6905658417935308)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#acos",
+      "type": "function"
+    },
+    {
+      "name": "ASin",
+      "description": "Returns the arcsine of a numeric field or expression. The expression value must\nbe in the range -1 to 1.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import ASin\n    >>> Vector.objects.create(x=0, y=1)\n    >>> vector = Vector.objects.annotate(x_asin=ASin(\"x\"), y_asin=ASin(\"y\")).get()\n    >>> vector.x_asin, vector.y_asin\n    (0.0, 1.5707963267948966)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import ASin\n    >>> FloatField.register_lookup(ASin)\n    >>> # Get vectors whose arcsine is less than 1\n    >>> vectors = Vector.objects.filter(x__asin__lt=1, y__asin__lt=1)\n\n`ATan`\n--------",
+      "example": ">>> from django.db.models.functions import ASin\n>>> Vector.objects.create(x=0, y=1)\n>>> vector = Vector.objects.annotate(x_asin=ASin(\"x\"), y_asin=ASin(\"y\")).get()\n>>> vector.x_asin, vector.y_asin\n(0.0, 1.5707963267948966)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#asin",
+      "type": "function"
+    },
+    {
+      "name": "ATan",
+      "description": "Returns the arctangent of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import ATan\n    >>> Vector.objects.create(x=3.12, y=6.987)\n    >>> vector = Vector.objects.annotate(x_atan=ATan(\"x\"), y_atan=ATan(\"y\")).get()\n    >>> vector.x_atan, vector.y_atan\n    (1.2606282660069106, 1.428638798133829)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import ATan\n    >>> FloatField.register_lookup(ATan)\n    >>> # Get vectors whose arctangent is less than 2\n    >>> vectors = Vector.objects.filter(x__atan__lt=2, y__atan__lt=2)\n\n`ATan2`\n---------",
+      "example": ">>> from django.db.models.functions import ATan\n>>> Vector.objects.create(x=3.12, y=6.987)\n>>> vector = Vector.objects.annotate(x_atan=ATan(\"x\"), y_atan=ATan(\"y\")).get()\n>>> vector.x_atan, vector.y_atan\n(1.2606282660069106, 1.428638798133829)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#atan",
+      "type": "function"
+    },
+    {
+      "name": "ATan2",
+      "description": "Returns the arctangent of `expression1 / expression2`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import ATan2\n    >>> Vector.objects.create(x=2.5, y=1.9)\n    >>> vector = Vector.objects.annotate(atan2=ATan2(\"x\", \"y\")).get()\n    >>> vector.atan2\n    0.9209258773829491\n\n`Ceil`\n--------",
+      "example": ">>> from django.db.models.functions import ATan2\n>>> Vector.objects.create(x=2.5, y=1.9)\n>>> vector = Vector.objects.annotate(atan2=ATan2(\"x\", \"y\")).get()\n>>> vector.atan2\n0.9209258773829491",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#atan2",
+      "type": "function"
+    },
+    {
+      "name": "Ceil",
+      "description": "Returns the smallest integer greater than or equal to a numeric field or\nexpression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Ceil\n    >>> Vector.objects.create(x=3.12, y=7.0)\n    >>> vector = Vector.objects.annotate(x_ceil=Ceil(\"x\"), y_ceil=Ceil(\"y\")).get()\n    >>> vector.x_ceil, vector.y_ceil\n    (4.0, 7.0)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Ceil\n    >>> FloatField.register_lookup(Ceil)\n    >>> # Get vectors whose ceil is less than 10\n    >>> vectors = Vector.objects.filter(x__ceil__lt=10, y__ceil__lt=10)\n\n`Cos`\n-------",
+      "example": ">>> from django.db.models.functions import Ceil\n>>> Vector.objects.create(x=3.12, y=7.0)\n>>> vector = Vector.objects.annotate(x_ceil=Ceil(\"x\"), y_ceil=Ceil(\"y\")).get()\n>>> vector.x_ceil, vector.y_ceil\n(4.0, 7.0)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#ceil",
+      "type": "function"
+    },
+    {
+      "name": "Cos",
+      "description": "Returns the cosine  of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Cos\n    >>> Vector.objects.create(x=-8.0, y=3.1415926)\n    >>> vector = Vector.objects.annotate(x_cos=Cos(\"x\"), y_cos=Cos(\"y\")).get()\n    >>> vector.x_cos, vector.y_cos\n    (-0.14550003380861354, -0.9999999999999986)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Cos\n    >>> FloatField.register_lookup(Cos)\n    >>> # Get vectors whose cosine is less than 0.5\n    >>> vectors = Vector.objects.filter(x__cos__lt=0.5, y__cos__lt=0.5)\n\n`Cot`\n-------",
+      "example": ">>> from django.db.models.functions import Cos\n>>> Vector.objects.create(x=-8.0, y=3.1415926)\n>>> vector = Vector.objects.annotate(x_cos=Cos(\"x\"), y_cos=Cos(\"y\")).get()\n>>> vector.x_cos, vector.y_cos\n(-0.14550003380861354, -0.9999999999999986)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#cos",
+      "type": "function"
+    },
+    {
+      "name": "Cot",
+      "description": "Returns the cotangent of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Cot\n    >>> Vector.objects.create(x=12.0, y=1.0)\n    >>> vector = Vector.objects.annotate(x_cot=Cot(\"x\"), y_cot=Cot(\"y\")).get()\n    >>> vector.x_cot, vector.y_cot\n    (-1.5726734063976826, 0.642092615934331)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Cot\n    >>> FloatField.register_lookup(Cot)\n    >>> # Get vectors whose cotangent is less than 1\n    >>> vectors = Vector.objects.filter(x__cot__lt=1, y__cot__lt=1)\n\n`Degrees`\n-----------",
+      "example": ">>> from django.db.models.functions import Cot\n>>> Vector.objects.create(x=12.0, y=1.0)\n>>> vector = Vector.objects.annotate(x_cot=Cot(\"x\"), y_cot=Cot(\"y\")).get()\n>>> vector.x_cot, vector.y_cot\n(-1.5726734063976826, 0.642092615934331)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#cot",
+      "type": "function"
+    },
+    {
+      "name": "Degrees",
+      "description": "Converts a numeric field or expression from radians to degrees.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Degrees\n    >>> Vector.objects.create(x=-1.57, y=3.14)\n    >>> vector = Vector.objects.annotate(x_d=Degrees(\"x\"), y_d=Degrees(\"y\")).get()\n    >>> vector.x_d, vector.y_d\n    (-89.95437383553924, 179.9087476710785)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Degrees\n    >>> FloatField.register_lookup(Degrees)\n    >>> # Get vectors whose degrees are less than 360\n    >>> vectors = Vector.objects.filter(x__degrees__lt=360, y__degrees__lt=360)\n\n`Exp`\n-------",
+      "example": ">>> from django.db.models.functions import Degrees\n>>> Vector.objects.create(x=-1.57, y=3.14)\n>>> vector = Vector.objects.annotate(x_d=Degrees(\"x\"), y_d=Degrees(\"y\")).get()\n>>> vector.x_d, vector.y_d\n(-89.95437383553924, 179.9087476710785)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#degrees",
+      "type": "function"
+    },
+    {
+      "name": "Exp",
+      "description": "Returns the value of `e` (the natural logarithm base) raised to the power of\na numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Exp\n    >>> Vector.objects.create(x=5.4, y=-2.0)\n    >>> vector = Vector.objects.annotate(x_exp=Exp(\"x\"), y_exp=Exp(\"y\")).get()\n    >>> vector.x_exp, vector.y_exp\n    (221.40641620418717, 0.1353352832366127)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Exp\n    >>> FloatField.register_lookup(Exp)\n    >>> # Get vectors whose exp() is greater than 10\n    >>> vectors = Vector.objects.filter(x__exp__gt=10, y__exp__gt=10)\n\n`Floor`\n---------",
+      "example": ">>> from django.db.models.functions import Exp\n>>> Vector.objects.create(x=5.4, y=-2.0)\n>>> vector = Vector.objects.annotate(x_exp=Exp(\"x\"), y_exp=Exp(\"y\")).get()\n>>> vector.x_exp, vector.y_exp\n(221.40641620418717, 0.1353352832366127)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#exp",
+      "type": "function"
+    },
+    {
+      "name": "Floor",
+      "description": "Returns the largest integer value not greater than a numeric field or\nexpression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Floor\n    >>> Vector.objects.create(x=5.4, y=-2.3)\n    >>> vector = Vector.objects.annotate(x_floor=Floor(\"x\"), y_floor=Floor(\"y\")).get()\n    >>> vector.x_floor, vector.y_floor\n    (5.0, -3.0)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Floor\n    >>> FloatField.register_lookup(Floor)\n    >>> # Get vectors whose floor() is greater than 10\n    >>> vectors = Vector.objects.filter(x__floor__gt=10, y__floor__gt=10)\n\n`Ln`\n------",
+      "example": ">>> from django.db.models.functions import Floor\n>>> Vector.objects.create(x=5.4, y=-2.3)\n>>> vector = Vector.objects.annotate(x_floor=Floor(\"x\"), y_floor=Floor(\"y\")).get()\n>>> vector.x_floor, vector.y_floor\n(5.0, -3.0)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#floor",
+      "type": "function"
+    },
+    {
+      "name": "Ln",
+      "description": "Returns the natural logarithm a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Ln\n    >>> Vector.objects.create(x=5.4, y=233.0)\n    >>> vector = Vector.objects.annotate(x_ln=Ln(\"x\"), y_ln=Ln(\"y\")).get()\n    >>> vector.x_ln, vector.y_ln\n    (1.6863989535702288, 5.4510384535657)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Ln\n    >>> FloatField.register_lookup(Ln)\n    >>> # Get vectors whose value greater than e\n    >>> vectors = Vector.objects.filter(x__ln__gt=1, y__ln__gt=1)\n\n`Log`\n-------",
+      "example": ">>> from django.db.models.functions import Ln\n>>> Vector.objects.create(x=5.4, y=233.0)\n>>> vector = Vector.objects.annotate(x_ln=Ln(\"x\"), y_ln=Ln(\"y\")).get()\n>>> vector.x_ln, vector.y_ln\n(1.6863989535702288, 5.4510384535657)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#ln",
+      "type": "function"
+    },
+    {
+      "name": "Log",
+      "description": "Accepts two numeric fields or expressions and returns the logarithm of\nthe second to base of the first.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Log\n    >>> Vector.objects.create(x=2.0, y=4.0)\n    >>> vector = Vector.objects.annotate(log=Log(\"x\", \"y\")).get()\n    >>> vector.log\n    2.0\n\n`Mod`\n-------",
+      "example": ">>> from django.db.models.functions import Log\n>>> Vector.objects.create(x=2.0, y=4.0)\n>>> vector = Vector.objects.annotate(log=Log(\"x\", \"y\")).get()\n>>> vector.log\n2.0",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#log",
+      "type": "function"
+    },
+    {
+      "name": "Mod",
+      "description": "Accepts two numeric fields or expressions and returns the remainder of\nthe first divided by the second (modulo operation).\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Mod\n    >>> Vector.objects.create(x=5.4, y=2.3)\n    >>> vector = Vector.objects.annotate(mod=Mod(\"x\", \"y\")).get()\n    >>> vector.mod\n    0.8\n\n`Pi`\n------",
+      "example": ">>> from django.db.models.functions import Mod\n>>> Vector.objects.create(x=5.4, y=2.3)\n>>> vector = Vector.objects.annotate(mod=Mod(\"x\", \"y\")).get()\n>>> vector.mod\n0.8",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#mod",
+      "type": "function"
+    },
+    {
+      "name": "Pi",
+      "description": "Returns the value of the mathematical constant `π`.\n\n`Power`\n---------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#pi",
+      "type": "function"
+    },
+    {
+      "name": "Power",
+      "description": "Accepts two numeric fields or expressions and returns the value of the first\nraised to the power of the second.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Power\n    >>> Vector.objects.create(x=2, y=-2)\n    >>> vector = Vector.objects.annotate(power=Power(\"x\", \"y\")).get()\n    >>> vector.power\n    0.25\n\n`Radians`\n-----------",
+      "example": ">>> from django.db.models.functions import Power\n>>> Vector.objects.create(x=2, y=-2)\n>>> vector = Vector.objects.annotate(power=Power(\"x\", \"y\")).get()\n>>> vector.power\n0.25",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#power",
+      "type": "function"
+    },
+    {
+      "name": "Radians",
+      "description": "Converts a numeric field or expression from degrees to radians.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Radians\n    >>> Vector.objects.create(x=-90, y=180)\n    >>> vector = Vector.objects.annotate(x_r=Radians(\"x\"), y_r=Radians(\"y\")).get()\n    >>> vector.x_r, vector.y_r\n    (-1.5707963267948966, 3.141592653589793)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Radians\n    >>> FloatField.register_lookup(Radians)\n    >>> # Get vectors whose radians are less than 1\n    >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)\n\n`Random`\n----------",
+      "example": ">>> from django.db.models.functions import Radians\n>>> Vector.objects.create(x=-90, y=180)\n>>> vector = Vector.objects.annotate(x_r=Radians(\"x\"), y_r=Radians(\"y\")).get()\n>>> vector.x_r, vector.y_r\n(-1.5707963267948966, 3.141592653589793)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#radians",
+      "type": "function"
+    },
+    {
+      "name": "Random",
+      "description": "Returns a random value in the range `0.0 ≤ x < 1.0`.\n\n`Round`\n---------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#random",
+      "type": "function"
+    },
+    {
+      "name": "Round",
+      "description": "Rounds a numeric field or expression to `precision` (must be an integer)\ndecimal places. By default, it rounds to the nearest integer. Whether half\nvalues are rounded up or down depends on the database.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Round\n    >>> Vector.objects.create(x=5.4, y=-2.37)\n    >>> vector = Vector.objects.annotate(x_r=Round(\"x\"), y_r=Round(\"y\", precision=1)).get()\n    >>> vector.x_r, vector.y_r\n    (5.0, -2.4)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Round\n    >>> FloatField.register_lookup(Round)\n    >>> # Get vectors whose round() is less than 20\n    >>> vectors = Vector.objects.filter(x__round__lt=20, y__round__lt=20)\n\n`Sign`\n--------",
+      "example": ">>> from django.db.models.functions import Round\n>>> Vector.objects.create(x=5.4, y=-2.37)\n>>> vector = Vector.objects.annotate(x_r=Round(\"x\"), y_r=Round(\"y\", precision=1)).get()\n>>> vector.x_r, vector.y_r\n(5.0, -2.4)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#round",
+      "type": "function"
+    },
+    {
+      "name": "Sign",
+      "description": "Returns the sign (-1, 0, 1) of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Sign\n    >>> Vector.objects.create(x=5.4, y=-2.3)\n    >>> vector = Vector.objects.annotate(x_sign=Sign(\"x\"), y_sign=Sign(\"y\")).get()\n    >>> vector.x_sign, vector.y_sign\n    (1, -1)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Sign\n    >>> FloatField.register_lookup(Sign)\n    >>> # Get vectors whose signs of components are less than 0.\n    >>> vectors = Vector.objects.filter(x__sign__lt=0, y__sign__lt=0)\n\n`Sin`\n-------",
+      "example": ">>> from django.db.models.functions import Sign\n>>> Vector.objects.create(x=5.4, y=-2.3)\n>>> vector = Vector.objects.annotate(x_sign=Sign(\"x\"), y_sign=Sign(\"y\")).get()\n>>> vector.x_sign, vector.y_sign\n(1, -1)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sign",
+      "type": "function"
+    },
+    {
+      "name": "Sin",
+      "description": "Returns the sine of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Sin\n    >>> Vector.objects.create(x=5.4, y=-2.3)\n    >>> vector = Vector.objects.annotate(x_sin=Sin(\"x\"), y_sin=Sin(\"y\")).get()\n    >>> vector.x_sin, vector.y_sin\n    (-0.7727644875559871, -0.7457052121767203)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Sin\n    >>> FloatField.register_lookup(Sin)\n    >>> # Get vectors whose sin() is less than 0\n    >>> vectors = Vector.objects.filter(x__sin__lt=0, y__sin__lt=0)\n\n`Sqrt`\n--------",
+      "example": ">>> from django.db.models.functions import Sin\n>>> Vector.objects.create(x=5.4, y=-2.3)\n>>> vector = Vector.objects.annotate(x_sin=Sin(\"x\"), y_sin=Sin(\"y\")).get()\n>>> vector.x_sin, vector.y_sin\n(-0.7727644875559871, -0.7457052121767203)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sin",
+      "type": "function"
+    },
+    {
+      "name": "Sqrt",
+      "description": "Returns the square root of a nonnegative numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Sqrt\n    >>> Vector.objects.create(x=4.0, y=12.0)\n    >>> vector = Vector.objects.annotate(x_sqrt=Sqrt(\"x\"), y_sqrt=Sqrt(\"y\")).get()\n    >>> vector.x_sqrt, vector.y_sqrt\n    (2.0, 3.46410)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Sqrt\n    >>> FloatField.register_lookup(Sqrt)\n    >>> # Get vectors whose sqrt() is less than 5\n    >>> vectors = Vector.objects.filter(x__sqrt__lt=5, y__sqrt__lt=5)\n\n`Tan`\n-------",
+      "example": ">>> from django.db.models.functions import Sqrt\n>>> Vector.objects.create(x=4.0, y=12.0)\n>>> vector = Vector.objects.annotate(x_sqrt=Sqrt(\"x\"), y_sqrt=Sqrt(\"y\")).get()\n>>> vector.x_sqrt, vector.y_sqrt\n(2.0, 3.46410)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sqrt",
+      "type": "function"
+    },
+    {
+      "name": "Tan",
+      "description": "Returns the tangent of a numeric field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Tan\n    >>> Vector.objects.create(x=0, y=12)\n    >>> vector = Vector.objects.annotate(x_tan=Tan(\"x\"), y_tan=Tan(\"y\")).get()\n    >>> vector.x_tan, vector.y_tan\n    (0.0, -0.6358599286615808)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import FloatField\n    >>> from django.db.models.functions import Tan\n    >>> FloatField.register_lookup(Tan)\n    >>> # Get vectors whose tangent is less than 0\n    >>> vectors = Vector.objects.filter(x__tan__lt=0, y__tan__lt=0)\n\n.. _text-functions:\n\nText functions\n==============\n\n`Chr`\n-------",
+      "example": ">>> from django.db.models.functions import Tan\n>>> Vector.objects.create(x=0, y=12)\n>>> vector = Vector.objects.annotate(x_tan=Tan(\"x\"), y_tan=Tan(\"y\")).get()\n>>> vector.x_tan, vector.y_tan\n(0.0, -0.6358599286615808)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#tan",
+      "type": "function"
+    },
+    {
+      "name": "Chr",
+      "description": "Accepts a numeric field or expression and returns the text representation of\nthe expression as a single character. It works the same as Python's `chr()`\nfunction.\n\nLike `Length`, it can be registered as a transform on `IntegerField`.\nThe default lookup name is `chr`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Chr\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.filter(name__startswith=Chr(ord(\"M\"))).get()\n    >>> print(author.name)\n    Margaret Smith\n\n`Concat`\n----------",
+      "example": ">>> from django.db.models.functions import Chr\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.filter(name__startswith=Chr(ord(\"M\"))).get()\n>>> print(author.name)\nMargaret Smith",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#chr",
+      "type": "function"
+    },
+    {
+      "name": "Concat",
+      "description": "Accepts a list of at least two text fields or expressions and returns the\nconcatenated text. Each argument must be of a text or char type. If you want\nto concatenate a `TextField()` with a `CharField()`, then be sure to tell\nDjango that the `output_field` should be a `TextField()`. Specifying an\n`output_field` is also required when concatenating a `Value` as in the\nexample below.\n\nThis function will never have a null result. On backends where a null argument\nresults in the entire expression being null, Django will ensure that each null\npart is converted to an empty string first.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> # Get the display name as \"name (goes_by)\"\n    >>> from django.db.models import CharField, Value as V\n    >>> from django.db.models.functions import Concat\n    >>> Author.objects.create(name=\"Margaret Smith\", goes_by=\"Maggie\")\n    >>> author = Author.objects.annotate(\n    ...     screen_name=Concat(\"name\", V(\" (\"), \"goes_by\", V(\")\"), output_field=CharField())\n    ... ).get()\n    >>> print(author.screen_name)\n    Margaret Smith (Maggie)\n\n`Left`\n--------",
+      "example": ">>> # Get the display name as \"name (goes_by)\"\n>>> from django.db.models import CharField, Value as V\n>>> from django.db.models.functions import Concat\n>>> Author.objects.create(name=\"Margaret Smith\", goes_by=\"Maggie\")\n>>> author = Author.objects.annotate(\n...     screen_name=Concat(\"name\", V(\" (\"), \"goes_by\", V(\")\"), output_field=CharField())\n... ).get()\n>>> print(author.screen_name)\nMargaret Smith (Maggie)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#concat",
+      "type": "function"
+    },
+    {
+      "name": "Left",
+      "description": "Returns the first `length` characters of the given text field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Left\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(first_initial=Left(\"name\", 1)).get()\n    >>> print(author.first_initial)\n    M\n\n`Length`\n----------",
+      "example": ">>> from django.db.models.functions import Left\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(first_initial=Left(\"name\", 1)).get()\n>>> print(author.first_initial)\nM",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#left",
+      "type": "function"
+    },
+    {
+      "name": "Length",
+      "description": "Accepts a single text field or expression and returns the number of characters\nthe value has. If the expression is null, then the length will also be null.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> # Get the length of the name and goes_by fields\n    >>> from django.db.models.functions import Length\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(\n    ...     name_length=Length(\"name\"), goes_by_length=Length(\"goes_by\")\n    ... ).get()\n    >>> print(author.name_length, author.goes_by_length)\n    (14, None)\n\nIt can also be registered as a transform. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import CharField\n    >>> from django.db.models.functions import Length\n    >>> CharField.register_lookup(Length)\n    >>> # Get authors whose name is longer than 7 characters\n    >>> authors = Author.objects.filter(name__length__gt=7)\n\n`Lower`\n---------",
+      "example": ">>> # Get the length of the name and goes_by fields\n>>> from django.db.models.functions import Length\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(\n...     name_length=Length(\"name\"), goes_by_length=Length(\"goes_by\")\n... ).get()\n>>> print(author.name_length, author.goes_by_length)\n(14, None)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#length",
+      "type": "function"
+    },
+    {
+      "name": "Lower",
+      "description": "Accepts a single text field or expression and returns the lowercase\nrepresentation.\n\nIt can also be registered as a transform as described in `Length`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Lower\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(name_lower=Lower(\"name\")).get()\n    >>> print(author.name_lower)\n    margaret smith\n\n`LPad`\n--------",
+      "example": ">>> from django.db.models.functions import Lower\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(name_lower=Lower(\"name\")).get()\n>>> print(author.name_lower)\nmargaret smith",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#lower",
+      "type": "function"
+    },
+    {
+      "name": "LPad",
+      "description": "Returns the value of the given text field or expression padded on the left side\nwith `fill_text` so that the resulting value is `length` characters long.\nThe default `fill_text` is a space.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import Value\n    >>> from django.db.models.functions import LPad\n    >>> Author.objects.create(name=\"John\", alias=\"j\")\n    >>> Author.objects.update(name=LPad(\"name\", 8, Value(\"abc\")))\n    1\n    >>> print(Author.objects.get(alias=\"j\").name)\n    abcaJohn\n\n`LTrim`\n---------",
+      "example": ">>> from django.db.models import Value\n>>> from django.db.models.functions import LPad\n>>> Author.objects.create(name=\"John\", alias=\"j\")\n>>> Author.objects.update(name=LPad(\"name\", 8, Value(\"abc\")))\n1\n>>> print(Author.objects.get(alias=\"j\").name)\nabcaJohn",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#lpad",
+      "type": "function"
+    },
+    {
+      "name": "LTrim",
+      "description": "Similar to `django.db.models.functions.Trim`, but removes only leading\nspaces.\n\n`MD5`\n-------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#ltrim",
+      "type": "function"
+    },
+    {
+      "name": "MD5",
+      "description": "Accepts a single text field or expression and returns the MD5 hash of the\nstring.\n\nIt can also be registered as a transform as described in `Length`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import MD5\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(name_md5=MD5(\"name\")).get()\n    >>> print(author.name_md5)\n    749fb689816b2db85f5b169c2055b247\n\n`Ord`\n-------",
+      "example": ">>> from django.db.models.functions import MD5\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(name_md5=MD5(\"name\")).get()\n>>> print(author.name_md5)\n749fb689816b2db85f5b169c2055b247",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#md5",
+      "type": "function"
+    },
+    {
+      "name": "Ord",
+      "description": "Accepts a single text field or expression and returns the Unicode code point\nvalue for the first character of that expression. It works similar to Python's\n`ord()` function, but an exception isn't raised if the expression is more\nthan one character long.\n\nIt can also be registered as a transform as described in `Length`.\nThe default lookup name is `ord`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Ord\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(name_code_point=Ord(\"name\")).get()\n    >>> print(author.name_code_point)\n    77\n\n`Repeat`\n----------",
+      "example": ">>> from django.db.models.functions import Ord\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(name_code_point=Ord(\"name\")).get()\n>>> print(author.name_code_point)\n77",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#ord",
+      "type": "function"
+    },
+    {
+      "name": "Repeat",
+      "description": "Returns the value of the given text field or expression repeated `number`\ntimes.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Repeat\n    >>> Author.objects.create(name=\"John\", alias=\"j\")\n    >>> Author.objects.update(name=Repeat(\"name\", 3))\n    1\n    >>> print(Author.objects.get(alias=\"j\").name)\n    JohnJohnJohn\n\n`Replace`\n-----------",
+      "example": ">>> from django.db.models.functions import Repeat\n>>> Author.objects.create(name=\"John\", alias=\"j\")\n>>> Author.objects.update(name=Repeat(\"name\", 3))\n1\n>>> print(Author.objects.get(alias=\"j\").name)\nJohnJohnJohn",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#repeat",
+      "type": "function"
+    },
+    {
+      "name": "Replace",
+      "description": "Replaces all occurrences of `text` with `replacement` in `expression`.\nThe default replacement text is the empty string. The arguments to the function\nare case-sensitive.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import Value\n    >>> from django.db.models.functions import Replace\n    >>> Author.objects.create(name=\"Margaret Johnson\")\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> Author.objects.update(name=Replace(\"name\", Value(\"Margaret\"), Value(\"Margareth\")))\n    2\n    >>> Author.objects.values(\"name\")\n    <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>\n\n`Reverse`\n-----------",
+      "example": ">>> from django.db.models import Value\n>>> from django.db.models.functions import Replace\n>>> Author.objects.create(name=\"Margaret Johnson\")\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> Author.objects.update(name=Replace(\"name\", Value(\"Margaret\"), Value(\"Margareth\")))\n2\n>>> Author.objects.values(\"name\")\n<QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#replace",
+      "type": "function"
+    },
+    {
+      "name": "Reverse",
+      "description": "Accepts a single text field or expression and returns the characters of that\nexpression in reverse order.\n\nIt can also be registered as a transform as described in `Length`. The\ndefault lookup name is `reverse`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Reverse\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(backward=Reverse(\"name\")).get()\n    >>> print(author.backward)\n    htimS teragraM\n\n`Right`\n---------",
+      "example": ">>> from django.db.models.functions import Reverse\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(backward=Reverse(\"name\")).get()\n>>> print(author.backward)\nhtimS teragraM",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#reverse",
+      "type": "function"
+    },
+    {
+      "name": "Right",
+      "description": "Returns the last `length` characters of the given text field or expression.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Right\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(last_letter=Right(\"name\", 1)).get()\n    >>> print(author.last_letter)\n    h\n\n`RPad`\n--------",
+      "example": ">>> from django.db.models.functions import Right\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(last_letter=Right(\"name\", 1)).get()\n>>> print(author.last_letter)\nh",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#right",
+      "type": "function"
+    },
+    {
+      "name": "RPad",
+      "description": "Similar to `django.db.models.functions.LPad`, but pads on the right\nside.\n\n`RTrim`\n---------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#rpad",
+      "type": "function"
+    },
+    {
+      "name": "RTrim",
+      "description": "Similar to `django.db.models.functions.Trim`, but removes only trailing\nspaces.\n\n`SHA1`, `SHA224`, `SHA256`, `SHA384`, and `SHA512`\n------------------------------------------------------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#rtrim",
+      "type": "function"
+    },
+    {
+      "name": "SHA1",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sha1",
+      "type": "function"
+    },
+    {
+      "name": "SHA224",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sha224",
+      "type": "function"
+    },
+    {
+      "name": "SHA256",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sha256",
+      "type": "function"
+    },
+    {
+      "name": "SHA384",
+      "description": "",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sha384",
+      "type": "function"
+    },
+    {
+      "name": "SHA512",
+      "description": "Accepts a single text field or expression and returns the particular hash of\nthe string.\n\nThey can also be registered as transforms as described in `Length`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import SHA1\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(name_sha1=SHA1(\"name\")).get()\n    >>> print(author.name_sha1)\n    b87efd8a6c991c390be5a68e8a7945a7851c7e5c",
+      "example": ">>> from django.db.models.functions import SHA1\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(name_sha1=SHA1(\"name\")).get()\n>>> print(author.name_sha1)\nb87efd8a6c991c390be5a68e8a7945a7851c7e5c",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#sha512",
+      "type": "function"
+    },
+    {
+      "name": "StrIndex",
+      "description": "Returns a positive integer corresponding to the 1-indexed position of the first\noccurrence of `substring` inside `expression`, or 0 if `substring` is not\nfound.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import Value as V\n    >>> from django.db.models.functions import StrIndex\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> Author.objects.create(name=\"Smith, Margaret\")\n    >>> Author.objects.create(name=\"Margaret Jackson\")\n    >>> Author.objects.filter(name=\"Margaret Jackson\").annotate(\n    ...     smith_index=StrIndex(\"name\", V(\"Smith\"))\n    ... ).get().smith_index\n    0\n    >>> authors = Author.objects.annotate(smith_index=StrIndex(\"name\", V(\"Smith\"))).filter(\n    ...     smith_index__gt=0\n    ... )\n    <QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>",
+      "example": ">>> from django.db.models import Value as V\n>>> from django.db.models.functions import StrIndex\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> Author.objects.create(name=\"Smith, Margaret\")\n>>> Author.objects.create(name=\"Margaret Jackson\")\n>>> Author.objects.filter(name=\"Margaret Jackson\").annotate(\n...     smith_index=StrIndex(\"name\", V(\"Smith\"))\n... ).get().smith_index\n0\n>>> authors = Author.objects.annotate(smith_index=StrIndex(\"name\", V(\"Smith\"))).filter(\n...     smith_index__gt=0\n... )\n<QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#strindex",
+      "type": "function"
+    },
+    {
+      "name": "Substr",
+      "description": "Returns a substring of length `length` from the field or expression starting\nat position `pos`. The position is 1-indexed, so the position must be greater\nthan 0. If `length` is `None`, then the rest of the string will be\nreturned.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> # Set the alias to the first 5 characters of the name as lowercase\n    >>> from django.db.models.functions import Lower, Substr\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> Author.objects.update(alias=Lower(Substr(\"name\", 1, 5)))\n    1\n    >>> print(Author.objects.get(name=\"Margaret Smith\").alias)\n    marga\n\n`Trim`\n--------",
+      "example": ">>> # Set the alias to the first 5 characters of the name as lowercase\n>>> from django.db.models.functions import Lower, Substr\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> Author.objects.update(alias=Lower(Substr(\"name\", 1, 5)))\n1\n>>> print(Author.objects.get(name=\"Margaret Smith\").alias)\nmarga",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#substr",
+      "type": "function"
+    },
+    {
+      "name": "Trim",
+      "description": "Returns the value of the given text field or expression with leading and\ntrailing spaces removed.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Trim\n    >>> Author.objects.create(name=\"  John  \", alias=\"j\")\n    >>> Author.objects.update(name=Trim(\"name\"))\n    1\n    >>> print(Author.objects.get(alias=\"j\").name)\n    John\n\n`Upper`\n---------",
+      "example": ">>> from django.db.models.functions import Trim\n>>> Author.objects.create(name=\"  John  \", alias=\"j\")\n>>> Author.objects.update(name=Trim(\"name\"))\n1\n>>> print(Author.objects.get(alias=\"j\").name)\nJohn",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#trim",
+      "type": "function"
+    },
+    {
+      "name": "Upper",
+      "description": "Accepts a single text field or expression and returns the uppercase\nrepresentation.\n\nIt can also be registered as a transform as described in `Length`.\n\nUsage example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models.functions import Upper\n    >>> Author.objects.create(name=\"Margaret Smith\")\n    >>> author = Author.objects.annotate(name_upper=Upper(\"name\")).get()\n    >>> print(author.name_upper)\n    MARGARET SMITH\n\n.. _window-functions:\n\nUUID functions\n==============\n\n`UUID4`\n---------",
+      "example": ">>> from django.db.models.functions import Upper\n>>> Author.objects.create(name=\"Margaret Smith\")\n>>> author = Author.objects.annotate(name_upper=Upper(\"name\")).get()\n>>> print(author.name_upper)\nMARGARET SMITH",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#upper",
+      "type": "function"
+    },
+    {
+      "name": "UUID4",
+      "description": "Generates a :rfc:`version 4 UUID <9562#section-5.4>`, which is random and is\ngenerated using a cryptographically secure method.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#uuid4",
+      "type": "function"
+    },
+    {
+      "name": "UUID7",
+      "description": "Generates a :rfc:`version 7 UUID <9562#section-5.7>`, which starts with a\ntime-based component.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#uuid7",
+      "type": "function"
+    },
+    {
+      "name": "CumeDist",
+      "description": "Calculates the cumulative distribution of a value within a window or partition.\nThe cumulative distribution is defined as the number of rows preceding or\npeered with the current row divided by the total number of rows in the frame.\n\n`DenseRank`\n-------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#cumedist",
+      "type": "function"
+    },
+    {
+      "name": "DenseRank",
+      "description": "Equivalent to `Rank` but does not have gaps.\n\n`FirstValue`\n--------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#denserank",
+      "type": "function"
+    },
+    {
+      "name": "FirstValue",
+      "description": "Returns the value evaluated at the row that's the first row of the window\nframe, or `None` if no such value exists.\n\n`Lag`\n-------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#firstvalue",
+      "type": "function"
+    },
+    {
+      "name": "Lag",
+      "description": "Calculates the value offset by `offset`, and if no row exists there, returns\n`default`.\n\n`default` must have the same type as the `expression`, however, this is\nonly validated by the database and not in Python.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#lag",
+      "type": "function"
+    },
+    {
+      "name": "LastValue",
+      "description": "Comparable to `FirstValue`, it calculates the last value in a given\nframe clause.\n\n`Lead`\n--------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#lastvalue",
+      "type": "function"
+    },
+    {
+      "name": "Lead",
+      "description": "Calculates the leading value in a given window-frames. Both\n`offset` and `default` are evaluated with respect to the current row.\n\n`default` must have the same type as the `expression`, however, this is\nonly validated by the database and not in Python.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#lead",
+      "type": "function"
+    },
+    {
+      "name": "NthValue",
+      "description": "Computes the row relative to the offset `nth` (must be a positive value)\nwithin the window. Returns `None` if no row exists.\n\nSome databases may handle a nonexistent nth-value differently. For example,\nOracle returns an empty string rather than `None` for character-based\nexpressions. Django doesn't do any conversions in these cases.\n\n`Ntile`\n---------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#nthvalue",
+      "type": "function"
+    },
+    {
+      "name": "Ntile",
+      "description": "Calculates a partition for each of the rows in the frame clause, distributing\nnumbers as evenly as possible between 1 and `num_buckets`. If the rows don't\ndivide evenly into a number of buckets, one or more buckets will be represented\nmore frequently.\n\n`PercentRank`\n---------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#ntile",
+      "type": "function"
+    },
+    {
+      "name": "PercentRank",
+      "description": "Computes the relative rank of the rows in the frame clause. This computation is\nequivalent to evaluating:\n\n.. code-block:: text\n\n    (rank - 1) / (total rows - 1)\n\nThe following table explains the calculation for the relative rank of a row:\n\n===== ===== ==== ============ =============\nRow # Value Rank Calculation  Relative Rank\n===== ===== ==== ============ =============\n1     15    1    (1-1)/(7-1)  0.0000\n2     20    2    (2-1)/(7-1)  0.1666\n3     20    2    (2-1)/(7-1)  0.1666\n4     20    2    (2-1)/(7-1)  0.1666\n5     30    5    (5-1)/(7-1)  0.6666\n6     30    5    (5-1)/(7-1)  0.6666\n7     40    7    (7-1)/(7-1)  1.0000\n===== ===== ==== ============ =============\n\n`Rank`\n--------",
+      "example": "(rank - 1) / (total rows - 1)",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#percentrank",
+      "type": "function"
+    },
+    {
+      "name": "Rank",
+      "description": "Comparable to `RowNumber`, this function ranks rows in the window. The\ncomputed rank contains gaps. Use `DenseRank` to compute rank without\ngaps.\n\n`RowNumber`\n-------------",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#rank",
+      "type": "function"
+    },
+    {
+      "name": "RowNumber",
+      "description": "Computes the row number according to the ordering of either the frame clause\nor the ordering of the whole query if there is no partitioning of the\nwindow-frames.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/functions/#rownumber",
+      "type": "function"
+    },
+    {
+      "name": "AnyValue",
+      "description": "Returns an arbitrary value from the non-null input values.\n\n    * Default alias: `<field>__anyvalue`\n    * Return type: same as input field, or `output_field` if supplied. If the\n      queryset or grouping is empty, `default` is returned.\n\n    Usage example:\n\n    .. code-block:: pycon\n\n        >>> # Get average rating for each year along with a sample headline\n        >>> # from that year.\n        >>> from django.db.models import AnyValue, Avg, F, Q\n        >>> sample_headline = AnyValue(\"headline\")\n        >>> Entry.objects.values(\n        ...     pub_year=F(\"pub_date__year\"),\n        ... ).annotate(\n        ...     avg_rating=Avg(\"rating\"),\n        ...     sample_headline=sample_headline,\n        ... )\n\n        >>> # Get a sample headline from each year with rating greater than 4.5.\n        >>> sample_headline = AnyValue(\n        ...     \"headline\",\n        ...     filter=Q(rating__gt=4.5),\n        ... )\n        >>> Entry.objects.values(\n        ...     pub_year=F(\"pub_date__year\"),\n        ... ).annotate(\n        ...     avg_rating=Avg(\"rating\"),\n        ...     sample_headline=sample_headline,\n        ... )\n\n    Supported on SQLite, MySQL, Oracle, and PostgreSQL 16+.",
+      "example": ">>> # Get average rating for each year along with a sample headline\n>>> # from that year.\n>>> from django.db.models import AnyValue, Avg, F, Q\n>>> sample_headline = AnyValue(\"headline\")\n>>> Entry.objects.values(\n...     pub_year=F(\"pub_date__year\"),\n... ).annotate(\n...     avg_rating=Avg(\"rating\"),\n...     sample_headline=sample_headline,\n... )\n\n>>> # Get a sample headline from each year with rating greater than 4.5.\n>>> sample_headline = AnyValue(\n...     \"headline\",\n...     filter=Q(rating__gt=4.5),\n... )\n>>> Entry.objects.values(\n...     pub_year=F(\"pub_date__year\"),\n... ).annotate(\n...     avg_rating=Avg(\"rating\"),\n...     sample_headline=sample_headline,\n... )",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#anyvalue",
+      "type": "aggregate"
+    },
+    {
+      "name": "Avg",
+      "description": "Returns the mean value of the given expression, which must be numeric\n    unless you specify a different `output_field`.\n\n    * Default alias: `<field>__avg`\n    * Return type: `float` if input is `int`, otherwise same as input\n      field, or `output_field` if supplied. If the queryset or grouping is\n      empty, `default` is returned.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#avg",
+      "type": "aggregate"
+    },
+    {
+      "name": "Count",
+      "description": "Returns the number of objects that are related through the provided\n    expression. `Count('*')` is equivalent to the SQL `COUNT(*)`\n    expression.\n\n    * Default alias: `<field>__count`\n    * Return type: `int`",
+      "example": "The ``default`` argument is not supported.",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#count",
+      "type": "aggregate"
+    },
+    {
+      "name": "Max",
+      "description": "Returns the maximum value of the given expression.\n\n    * Default alias: `<field>__max`\n    * Return type: same as input field, or `output_field` if supplied. If the\n      queryset or grouping is empty, `default` is returned.\n\n`Min`\n~~~~~~~",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#max",
+      "type": "aggregate"
+    },
+    {
+      "name": "Min",
+      "description": "Returns the minimum value of the given expression.\n\n    * Default alias: `<field>__min`\n    * Return type: same as input field, or `output_field` if supplied. If the\n      queryset or grouping is empty, `default` is returned.\n\n`StdDev`\n~~~~~~~~~~",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#min",
+      "type": "aggregate"
+    },
+    {
+      "name": "StdDev",
+      "description": "Returns the standard deviation of the data in the provided expression.\n\n    * Default alias: `<field>__stddev`\n    * Return type: `float` if input is `int`, otherwise same as input\n      field, or `output_field` if supplied. If the queryset or grouping is\n      empty, `default` is returned.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#stddev",
+      "type": "aggregate"
+    },
+    {
+      "name": "Sum",
+      "description": "Computes the sum of all values of the given expression.\n\n    * Default alias: `<field>__sum`\n    * Return type: same as input field, or `output_field` if supplied. If the\n      queryset or grouping is empty, `default` is returned.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#sum",
+      "type": "aggregate"
+    },
+    {
+      "name": "Variance",
+      "description": "Returns the variance of the data in the provided expression.\n\n    * Default alias: `<field>__variance`\n    * Return type: `float` if input is `int`, otherwise same as input\n      field, or `output_field` if supplied. If the queryset or grouping is\n      empty, `default` is returned.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#variance",
+      "type": "aggregate"
+    },
+    {
+      "name": "StringAgg",
+      "description": "Returns the input values concatenated into a string, separated by the\n    `delimiter` string, or `default` if there are no values.\n\n    * Default alias: `<field>__stringagg`\n    * Return type: `string` or `output_field` if supplied. If the\n      queryset or grouping is empty, `default` is returned.",
+      "example": "",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#stringagg",
+      "type": "aggregate"
+    },
+    {
+      "name": "Prefetch",
+      "description": "The `Prefetch()` object can be used to control the operation of\n`django.db.models.query.QuerySet.prefetch_related()`.\n\nThe `lookup` argument describes the relations to follow and works the same\nas the string based lookups passed to\n`django.db.models.query.QuerySet.prefetch_related()`. For example:\n\n.. code-block:: pycon\n\n    >>> from django.db.models import Prefetch\n    >>> Question.objects.prefetch_related(Prefetch(\"choice_set\")).get().choice_set.all()\n    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>\n    # This will only execute two queries regardless of the number of Question\n    # and Choice objects.\n    >>> Question.objects.prefetch_related(Prefetch(\"choice_set\"))\n    <QuerySet [<Question: What's up?>]>\n\nThe `queryset` argument supplies a base `QuerySet` for the given lookup.\nThis is useful to further filter down the prefetch operation, or to call\n`django.db.models.query.QuerySet.select_related()` from the prefetched\nrelation, hence reducing the number of queries even further:\n\n.. code-block:: pycon\n\n    >>> voted_choices = Choice.objects.filter(votes__gt=0)\n    >>> voted_choices\n    <QuerySet [<Choice: The sky>]>\n    >>> prefetch = Prefetch(\"choice_set\", queryset=voted_choices)\n    >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()\n    <QuerySet [<Choice: The sky>]>\n\nThe `to_attr` argument sets the result of the prefetch operation to a custom\nattribute:\n\n.. code-block:: pycon\n\n    >>> prefetch = Prefetch(\"choice_set\", queryset=voted_choices, to_attr=\"voted_choices\")\n    >>> Question.objects.prefetch_related(prefetch).get().voted_choices\n    <QuerySet [<Choice: The sky>]>\n    >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()\n    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>",
+      "example": ">>> from django.db.models import Prefetch\n>>> Question.objects.prefetch_related(Prefetch(\"choice_set\")).get().choice_set.all()\n<QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>\n# This will only execute two queries regardless of the number of Question\n# and Choice objects.\n>>> Question.objects.prefetch_related(Prefetch(\"choice_set\"))\n<QuerySet [<Question: What's up?>]>",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#prefetch",
+      "type": "aggregate"
+    },
+    {
+      "name": "FilteredRelation",
+      "description": "",
+      "example": ">>> from django.db.models import FilteredRelation, Q\n>>> Restaurant.objects.annotate(\n...     pizzas_vegetarian=FilteredRelation(\n...         \"pizzas\",\n...         condition=Q(pizzas__vegetarian=True),\n...     ),\n... ).filter(pizzas_vegetarian__name__icontains=\"mozzarella\")",
+      "docs_url": "https://docs.djangoproject.com/en/stable/ref/models/aggregation/#filteredrelation",
+      "type": "aggregate"
+    }
+  ]
+}

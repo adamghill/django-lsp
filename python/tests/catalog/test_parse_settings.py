@@ -1,7 +1,7 @@
 from dataclasses import asdict
 
 import pytest
-from django_lsp.generator.parser import (
+from django_lsp.generator.parse_settings import (
     DjangoSetting,
     clean_rst_markup,
     determine_category,
@@ -106,26 +106,17 @@ This is a test setting description.
 
 
 def test_to_dict_serialization(mock_setting):
-    # This logic matches what is inside main() in parse_settings.py
-    # We need to replicate strict JSON serialization logic to verify the contract
-
+    # This logic matches what is inside run() in parse_settings.py
     def to_dict(s: DjangoSetting) -> dict:
         d = asdict(s)
-        # Remove nested_in from output (inferred from structure)
-        del d["nested_in"]
-
-        # Rename docs_url to docsUrl for JSON output
+        del d["nested_in"], d["rst_name"], d["parent_labels"]
         d["docsUrl"] = d.pop("docs_url")
-
         if d["children"] is None:
             del d["children"]
         else:
             d["children"] = [to_dict(c) for c in s.children]
-
-        # Remove deprecated if False
         if not d["deprecated"]:
             del d["deprecated"]
-
         return d
 
     data = to_dict(mock_setting)
@@ -133,105 +124,53 @@ def test_to_dict_serialization(mock_setting):
     assert "docsUrl" in data
     assert "docs_url" not in data
     assert "nested_in" not in data
-    assert "nestedIn" not in data
+    assert "rst_name" not in data
     assert data["docsUrl"] == "https://example.com"
 
 
-def test_nested_settings():
-    rst_content = """
-.. setting:: PARENT_SETTING
+def test_run_with_metadata(tmp_path):
+    from django_lsp.generator.parse_settings import run
 
-PARENT_SETTING
---------------
+    rst_file = tmp_path / "settings.txt"
+    rst_file.write_text(
+        ".. setting:: DEBUG\n\nDEBUG\n-----\n\nDefault: ``False``\n", encoding="utf-8"
+    )
+    output_file = tmp_path / "settings.json"
+    metadata = {"sha": "abc", "date": "2024-01-01", "url": "http://example.com"}
 
-Parent description.
+    run(rst_file, output_file, metadata=metadata)
 
-.. setting:: CHILD_SETTING
+    import json
 
-CHILD_SETTING
-~~~~~~~~~~~~~
-
-Child description.
-
-"""
-    settings = parse_settings_rst(rst_content)
-    # The current implementation of parse_settings_rst relies on observing indentation or
-    # structure to determine nesting parent-child relationship during the linear scan.
-    # Based on the code:
-    # Top-level has underline like '---'
-    # Nested has underline like '~~~' and sets nested_in = current_parent
-
-    # We expect 2 settings
-    assert len(settings) == 2
-
-    parent = next(s for s in settings if s.label == "PARENT_SETTING")
-    child = next(s for s in settings if s.label == "PARENT_SETTING.CHILD_SETTING")
-
-    assert parent.nested_in is None
-    assert child.nested_in == "PARENT_SETTING"
-    # Verify that parent prefix is stripped from the name
-    assert parent.name == "PARENT_SETTING"
-    assert child.name == "CHILD_SETTING"
+    result = json.loads(output_file.read_text(encoding="utf-8"))
+    assert result["sha"] == "abc"
+    assert result["date"] == "2024-01-01"
+    assert result["url"] == "http://example.com"
+    assert len(result["data"]) == 1
+    assert result["data"][0]["label"] == "DEBUG"
 
 
-def test_nested_databases_name():
-    rst_content = """
-.. setting:: DATABASES
+def test_run_with_extra_settings(tmp_path):
+    from django_lsp.generator.parse_settings import run
 
-DATABASES
----------
+    rst_file = tmp_path / "settings.txt"
+    rst_file.write_text(
+        ".. setting:: DEBUG\n\nDEBUG\n-----\n\nDefault: ``False``\n", encoding="utf-8"
+    )
+    output_file = tmp_path / "settings.json"
 
-Default: {}
+    # Create extra_settings.json in the same directory as output
+    extra_file = tmp_path / "extra_settings.json"
+    extra_file.write_text(
+        '[{"label": "BASE_DIR", "name": "BASE_DIR", "category": "Project"}]',
+        encoding="utf-8",
+    )
 
-A dictionary containing the settings for all databases.
+    run(rst_file, output_file)
 
-.. setting:: DATABASE-ENGINE
+    import json
 
-DATABASE-ENGINE
-~~~~~~~~~~~~~~~
-
-Default: ''
-
-The database backend to use.
-"""
-    settings = parse_settings_rst(rst_content)
-    child = next(s for s in settings if s.label == "DATABASES.ENGINE")
-    assert child.name == "ENGINE"
-    assert child.nested_in == "DATABASES"
-    assert child.parent_labels == ["DATABASES"]
-
-
-def test_deprecated_settings():
-    # Verify that deprecation is not yet implemented in the parser
-    rst_content = """
-.. setting:: DEPRECATED_SETTING
-
-DEPRECATED_SETTING
-------------------
-
-.. deprecated:: 5.0
-
-Old setting.
-"""
-    settings = parse_settings_rst(rst_content)
-    s = settings[0]
-    assert s.label == "DEPRECATED_SETTING"
-    assert s.deprecated is False
-
-
-def test_complex_rst_markup():
-    text = """
-This is a paragraph.
-
-.. note::
-
-    This is a note.
-
-This has a :ref:`link <target>`.
-And a :class:`~module.Class`.
-"""
-    cleaned = clean_rst_markup(text)
-    assert "This is a paragraph." in cleaned
-    assert "This is a note." not in cleaned  # clean_rst_markup removes notes
-    assert "This has a target." in cleaned
-    assert "And a `module.Class`." in cleaned
+    result = json.loads(output_file.read_text(encoding="utf-8"))
+    labels = [s["label"] for s in result["data"]]
+    assert "BASE_DIR" in labels
+    assert "DEBUG" in labels

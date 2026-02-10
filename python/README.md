@@ -4,11 +4,13 @@ Rich, context-aware autocomplete for Django `settings.py` files powered by a **L
 
 ## Features
 
-- **Context-aware completions** — offers top-level settings at module scope, and nested sub-keys (like `ENGINE`, `HOST`, `PORT`) when your cursor is inside a `DATABASES` or `CACHES` block.
-- **Rich documentation panel** — each completion expands to show a full description, a working code example, and a link to the official Django docs.
-- **Typo detection** — diagnostics warn about potential typos (e.g., `DEUBG` → Did you mean `DEBUG`?)
-- **Hover documentation** — hover over any setting to see its default value, description, and example.
-- **Editor-agnostic** — the Python LSP server can be used with Neovim, Emacs, Sublime, and other LSP-compatible editors.
+- **Context-aware completions** — offers settings completions at module scope and nested sub-keys.
+- **ORM completions** — provides intelligent autocompletion for Django QuerySets (e.g., `filter`, `exclude`) and model fields.
+- **Rich documentation panel** — each completion expands to show a full description, working examples, and Django docs links.
+- **Typo detection** — diagnostics warn about potential typos in settings.
+- **Hover documentation** — hover over any setting OR model field in a QuerySet to see documentation and lookup details.
+- **ORM support** — Powered by parso for fast, resilient parsing without executing your code.
+- **Editor-agnostic** — compatible with any LSP-ready editor (Neovim, VS Code, etc.).
 
 ## Requirements
 
@@ -49,7 +51,7 @@ The Python LSP server can be used directly:
 
 ```bash
 # Start the LSP server (communicates via stdio)
-cd lsp/src && python -m django_lsp
+cd python/src && python -m django_lsp
 ```
 
 ### Neovim (nvim-lspconfig)
